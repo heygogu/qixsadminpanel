@@ -2,10 +2,11 @@
 "use client";
 import { createContext, useContext, ReactNode, useState } from "react";
 import { useRouter } from "next/navigation"; // Updated to next/navigation
-import { destroyCookie } from "nookies";
+import { destroyCookie, parseCookies } from "nookies";
 import henceforthApi from "@/app/utils/henceforthApis";
 // import { formatDuration } from "date-fns";
 import toast from "react-hot-toast";
+import { cookies } from "next/headers";
 
 interface UserInfo {
   access_token?: string;
@@ -19,8 +20,8 @@ interface GlobalContextType {
   stopSpaceEnter: (event: React.KeyboardEvent) => boolean;
   getProfile: () => Promise<void>;
   formatDuration: (seconds: number) => string;
-  Toast:any,
-  getCountryByPhoneCode: (countryCode: string) => string | undefined; 
+  Toast: any,
+  getCountryByPhoneCode: (countryCode: string) => string | undefined;
   convertToDashLowercase: (name: string) => string;
   convertToOriginalCase: (hyphenatedName: string) => string;
 
@@ -37,9 +38,12 @@ export function GlobalProvider({ children, userInfo: initialUserInfo }: GlobalPr
   const router = useRouter();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(initialUserInfo || null);
   console.log(initialUserInfo, "initialUserInfo");
-
+  const accessToken = parseCookies()["COOKIES_ADMIN_ACCESS_TOKEN"];
   if (userInfo?.access_token) {
     henceforthApi.setToken(userInfo.access_token);
+  }
+  if (accessToken) {
+    henceforthApi.setToken(accessToken);
   }
 
   const stopSpaceEnter = (event: React.KeyboardEvent): boolean => {
@@ -48,7 +52,7 @@ export function GlobalProvider({ children, userInfo: initialUserInfo }: GlobalPr
         event.preventDefault();
         return false;
       }
-      
+
       // Allow only letters and space
       if (!/^[a-zA-Z ]$/.test(event.key) && !event.ctrlKey && !event.metaKey) {
         event.preventDefault();
@@ -61,7 +65,7 @@ export function GlobalProvider({ children, userInfo: initialUserInfo }: GlobalPr
   const formatDuration = (seconds: number): string => {
     // Handle invalid or negative inputs
     if (seconds < 0 || isNaN(seconds)) return '0 s';
-  
+
     // Define time units
     const units = [
       { name: 'd', seconds: 86400 },
@@ -69,30 +73,30 @@ export function GlobalProvider({ children, userInfo: initialUserInfo }: GlobalPr
       { name: 'm', seconds: 60 },
       { name: 's', seconds: 1 }
     ];
-  
+
     // Find the appropriate unit and calculate
     for (const unit of units) {
       if (seconds >= unit.seconds) {
         const value = Math.floor(seconds / unit.seconds);
         const remainder = seconds % unit.seconds;
-  
+
         // Construct the primary unit part
         let result = `${value} ${unit.name}`;
-  
+
         // Add secondary unit if there's a significant remainder
         if (unit.name !== 's' && remainder > 0) {
           const nextUnit = units[units.indexOf(unit) + 1];
           const nextValue = Math.floor(remainder / nextUnit.seconds);
-          
+
           if (nextValue > 0) {
             result += ` ${nextValue} ${nextUnit.name}`;
           }
         }
-  
+
         return result;
       }
     }
-  
+
     return '0 s';
   };
 
@@ -128,7 +132,7 @@ export function GlobalProvider({ children, userInfo: initialUserInfo }: GlobalPr
   function getCountryByPhoneCode(countryCode: string): string | undefined {
     // Remove any '+' or leading zeros
     const cleanedCode = countryCode?.replace(/^\+?0*/, '');
-    
+
     const countryCodeMap: { [code: string]: string } = {
       // North America
       '1': 'United States',
@@ -157,7 +161,7 @@ export function GlobalProvider({ children, userInfo: initialUserInfo }: GlobalPr
       '1849': 'Dominican Republic',
       '1868': 'Trinidad and Tobago',
       '1876': 'Jamaica',
-  
+
       // Europe
       '44': 'United Kingdom',
       '33': 'France',
@@ -173,7 +177,7 @@ export function GlobalProvider({ children, userInfo: initialUserInfo }: GlobalPr
       '421': 'Slovakia',
       '386': 'Slovenia',
       '385': 'Croatia',
-     
+
       '387': 'Serbia',
       '389': 'North Macedonia',
       '373': 'Moldova',
@@ -185,8 +189,8 @@ export function GlobalProvider({ children, userInfo: initialUserInfo }: GlobalPr
       '381': 'Serbia',
       '382': 'Montenegro',
       '383': 'Kosovo',
-      
-  
+
+
       // Asia
       '86': 'China',
       '91': 'India',
@@ -212,7 +216,7 @@ export function GlobalProvider({ children, userInfo: initialUserInfo }: GlobalPr
       '995': 'Georgia',
       '996': 'Kyrgyzstan',
       '998': 'Uzbekistan',
-  
+
       // Africa
       '20': 'Egypt',
       '212': 'Morocco',
@@ -268,7 +272,7 @@ export function GlobalProvider({ children, userInfo: initialUserInfo }: GlobalPr
       '267': 'Botswana',
       '268': 'Eswatini',
       '269': 'Comoros',
-  
+
       // Oceania
       '61': 'Australia',
       '64': 'New Zealand',
@@ -283,7 +287,7 @@ export function GlobalProvider({ children, userInfo: initialUserInfo }: GlobalPr
       '690': 'Tokelau',
       '691': 'Micronesia',
       '692': 'Marshall Islands',
-  
+
       // South America
       '55': 'Brazil',
       '54': 'Argentina',
@@ -294,7 +298,7 @@ export function GlobalProvider({ children, userInfo: initialUserInfo }: GlobalPr
       '595': 'Paraguay',
       '598': 'Uruguay'
     };
-  
+
     return countryCodeMap[cleanedCode];
   }
   const logout = async () => {
@@ -309,26 +313,26 @@ export function GlobalProvider({ children, userInfo: initialUserInfo }: GlobalPr
   function convertToDashLowercase(name: string): string {
     // Trim any extra whitespace and split into words
     const words = name.trim().split(/\s+/);
-    
+
     // Convert to lowercase and join with hyphens
     return words
-        .map(word => word.toLowerCase())
-        .join('-');
-}
+      .map(word => word.toLowerCase())
+      .join('-');
+  }
 
 
-function convertToOriginalCase(hyphenatedName: string): string {
-  // Split the hyphenated name into words
-  if(!hyphenatedName) return '';
-  const words = hyphenatedName.split('-');
-  
-  // Capitalize first letter of each word
-  return words
-      .map(word => 
-          word.charAt(0).toUpperCase() + word.slice(1)
+  function convertToOriginalCase(hyphenatedName: string): string {
+    // Split the hyphenated name into words
+    if (!hyphenatedName) return '';
+    const words = hyphenatedName.split('-');
+
+    // Capitalize first letter of each word
+    return words
+      .map(word =>
+        word.charAt(0).toUpperCase() + word.slice(1)
       )
       .join(' ');
-}
+  }
 
 
   const getProfile = async () => {
@@ -338,8 +342,8 @@ function convertToOriginalCase(hyphenatedName: string): string {
       console.log(apiRes?.data, "apiRes?.data");
     } catch (error) {
       console.error('Profile fetch error:', error);
-      
-     
+
+
     }
   };
 
@@ -367,7 +371,7 @@ function convertToOriginalCase(hyphenatedName: string): string {
 export function useGlobalContext() {
   const context = useContext(GlobalContext);
   if (context === undefined) {
-    // throw new Error('useGlobalContext must be used within a GlobalProvider');
+    throw new Error('useGlobalContext must be used within a GlobalProvider');
   }
   return context;
 }

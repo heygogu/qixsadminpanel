@@ -8,7 +8,10 @@ import henceforthApi from '@/app/utils/henceforthApis';
 import { cookies } from 'next/headers';
 import { Toaster } from 'react-hot-toast';
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
+import HolyLoader from "holy-loader";
 import "./globals.css";
+import { redirect } from 'next/navigation';
+import favicon from "@/app/assets/images/favicon.ico";
 
 interface UserInfo {
   // Define the properties of UserInfo based on the expected structure
@@ -19,8 +22,11 @@ interface UserInfo {
 }
 
 export const metadata: Metadata = {
-  title: 'QIXS',
-  description: 'AI-powered call and chat services'
+  title: 'QIXS Admin',
+  description: 'AI-powered call and chat services',
+  icons: {
+    icon: favicon.src,
+  },
 };
 
 const rubik = Poppins({
@@ -42,9 +48,12 @@ export default async function RootLayout({
     try {
       henceforthApi.setToken(accessToken);
       const apiRes = await henceforthApi.SuperAdmin.profile();
-      userInfo = { ...apiRes.data, access_token: accessToken };
+      userInfo = apiRes?.data;
+      redirect('/dashboard');
+
     } catch (error) {
       console.error('Error fetching user info:', error);
+      // redirect("/login")
       // Consider redirecting to login or handling the error appropriately
     }
   }
@@ -63,6 +72,12 @@ export default async function RootLayout({
           <NuqsAdapter>
 
             {children}
+            <HolyLoader
+              color="#7820cf"
+              height="2px"
+              speed={250}
+              easing="linear"
+              showSpinner={false} />
 
           </NuqsAdapter>
         </GlobalProvider>

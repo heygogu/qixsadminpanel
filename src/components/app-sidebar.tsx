@@ -45,6 +45,7 @@ import {
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "./ui/breadcrumb"
 import Image from "next/image"
 import { NavSettings } from "./nav-settings"
+import Breadcrumbs from "./common/Breadcrumbs"
 
 // This is sample data.
 const data = {
@@ -80,7 +81,7 @@ const data = {
     },
     {
       title: "Workspaces",
-      url: "/workspaces",
+      url: "/workspaces/page/1",
       icon: ShoppingBag,
       // items: [
       //   {
@@ -99,7 +100,7 @@ const data = {
     },
     {
       title: "Vendors",
-      url: "/vendors",
+      url: "/vendors/page/1",
       icon: UsersRound,
       // items: [
       //   {
@@ -122,7 +123,7 @@ const data = {
     },
     {
       title: "Accounting",
-      url: "/accounting",
+      url: "/accounting/page/1",
       icon: UserRoundPen,
       // items: [
       //   {
@@ -148,7 +149,7 @@ const data = {
   projects: [
     {
       name: "Ticket Management",
-      url: "/ticket-management",
+      url: "/ticket-management/page/1",
       icon: TicketCheck,
       items: []
     },
@@ -167,7 +168,7 @@ const data = {
         },
         {
           title: "Staff",
-          url: "/settings/staff",
+          url: "/settings/staff/page/1",
           icon: UserRoundPen
         },
         {
@@ -213,7 +214,7 @@ export function AppSidebar({
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
             <SidebarSeparator orientation="vertical" className="mr-2 h-4" />
-            <Breadcrumb>
+            {/* <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
                   <BreadcrumbLink href="#">
@@ -225,7 +226,8 @@ export function AppSidebar({
                   <BreadcrumbPage>{data.currentPage.title}</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
-            </Breadcrumb>
+            </Breadcrumb> */}
+            <Breadcrumbs />
           </div>
         </header>
         {/* <div className="flex flex-1 flex-col gap-4 p-4 pt-0">

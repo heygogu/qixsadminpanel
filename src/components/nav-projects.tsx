@@ -99,14 +99,14 @@ export function NavProjects({
                 isActive={realPathMatch === item.url.split('/')[1]} // Compare first segments
                 asChild
               >
-                <a href={item.url}>
+                <Link href={item.url}>
                   <item.icon />
                   <span
                     className={realPathMatch === item.url.split('/')[1] ? 'font-semibold' : ''}
                   >
                     {item.name}
                   </span>
-                </a>
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           )

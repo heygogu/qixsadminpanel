@@ -25,11 +25,14 @@ import {
 } from 'lucide-react';
 import DashboardLayout from '@/components/layouts/dashboard-layout';
 import PageContainer from '@/components/layouts/page-container';
+import { useGlobalContext } from '../providers/Provider';
+import henceforthApi from '../utils/henceforthApis';
 
 const AdminProfile = () => {
     const [showEditProfile, setShowEditProfile] = useState(false);
     const [showChangePassword, setShowChangePassword] = useState(false);
-    const [logo, setLogo] = useState<string | null>(null);
+    const { userInfo } = useGlobalContext()
+    const [logo, setLogo] = useState<string>(userInfo?.profile_pic ?? '');
     const [imageLoading, setImageLoading] = useState(false);
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         setImageLoading(true);
@@ -50,7 +53,7 @@ const AdminProfile = () => {
             <h1 className=" text-2xl font-semibold pb-4">Profile Settings</h1>
             <div className="">
                 {/* Banner */}
-                <div className="h-64 bg-gradient-to-r rounded-lg from-blue-600 to-blue-800">
+                <div className="h-64 bg-gradient-to-r rounded-lg from-violet-700 to-primary">
 
                 </div>
 
@@ -62,8 +65,8 @@ const AdminProfile = () => {
                             <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8">
                                 <div className="relative">
                                     <Avatar className="w-24 h-24 border-4 border-white shadow-lg">
-                                        <AvatarImage className='object-cover' src={logo ? logo : "https://github.com/shadcn.png"} />
-                                        <AvatarFallback>AD</AvatarFallback>
+                                        <AvatarImage className='object-cover' src={henceforthApi?.FILES?.imageOriginal(logo, '')} />
+                                        <AvatarFallback className='bg-gray-200'>SA</AvatarFallback>
                                     </Avatar>
                                     <Button
                                         size="icon"
@@ -87,8 +90,8 @@ const AdminProfile = () => {
                                 </div>
 
                                 <div className="text-center md:text-left flex-1">
-                                    <h2 className="text-2xl font-bold text-gray-900">Admin User</h2>
-                                    <p className="text-gray-500">admin@company.com</p>
+                                    <h2 className="text-2xl font-bold capitalize text-gray-900">{userInfo?.name}</h2>
+                                    <p className="text-gray-500">{userInfo?.email}</p>
                                     <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-3">
                                         <Dialog open={showEditProfile} onOpenChange={setShowEditProfile}>
                                             <DialogTrigger asChild>
@@ -171,15 +174,15 @@ const AdminProfile = () => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="space-y-1">
                                         <p className="text-sm font-medium text-gray-500">Full Name</p>
-                                        <p className="text-gray-900">Admin User</p>
+                                        <p className="text-gray-900 capitalize">{userInfo?.name}</p>
                                     </div>
                                     <div className="space-y-1">
                                         <p className="text-sm font-medium text-gray-500">Email</p>
-                                        <p className="text-gray-900">admin@company.com</p>
+                                        <p className="text-gray-900">{userInfo?.email}</p>
                                     </div>
                                     <div className="space-y-1">
                                         <p className="text-sm font-medium text-gray-500">Role</p>
-                                        <p className="text-gray-900">Administrator</p>
+                                        <p className="text-gray-900">{userInfo?.role ?? "Super Admin"}</p>
                                     </div>
                                     <div className="space-y-1">
                                         <p className="text-sm font-medium text-gray-500">Last Login</p>

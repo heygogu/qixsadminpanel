@@ -7,6 +7,9 @@ import {
   CreditCard,
   LogOut,
   Sparkles,
+  User,
+  UserPlus,
+  UserPlus2,
 } from "lucide-react"
 
 import {
@@ -32,6 +35,7 @@ import {
 import { useGlobalContext } from "@/app/providers/Provider"
 import henceforthApi from "@/app/utils/henceforthApis"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 
 export function NavUser({
   user,
@@ -55,9 +59,9 @@ export function NavUser({
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={henceforthApi?.FILES?.imageOriginal(userInfo?.profile_pic, "https://github.com/shadcn.png")} alt={userInfo?.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+              <Avatar className="h-9 w-9 rounded-full border-white border-4 shadow-lg">
+                <AvatarImage className="object-cover" src={henceforthApi?.FILES?.imageOriginal(userInfo?.profile_pic, "")} alt={userInfo?.name} />
+                <AvatarFallback className="rounded-full bg-gray-200">SA</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">{userInfo?.name ?? "Super Admin"}</span>
@@ -74,9 +78,9 @@ export function NavUser({
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={henceforthApi?.FILES?.imageOriginal(userInfo?.profile_pic, "https://github.com/shadcn.png")} alt={userInfo?.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <Avatar className="h-10 w-10 rounded-full border-4 border-white shadow-lg">
+                  <AvatarImage src={henceforthApi?.FILES?.imageOriginal(userInfo?.profile_pic, "")} alt={userInfo?.name} />
+                  <AvatarFallback className="rounded-circle bg-gray-200">SA</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">{userInfo?.name ?? "Super Admin"}</span>
@@ -90,23 +94,25 @@ export function NavUser({
                 <Sparkles />
                 Upgrade to Pro
               </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
+            </DropdownMenuGroup> */}
+            {/* <DropdownMenuSeparator /> */}
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={() => router.push("/profile")}>
-                <BadgeCheck />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
+              <Link href="/profile" passHref>
+                <DropdownMenuItem>
+                  <UserPlus2 />
+                  Profile
+                </DropdownMenuItem>
+              </Link>
+              {/* <DropdownMenuItem>
                 <CreditCard />
                 Billing
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Bell />
                 Notifications
-              </DropdownMenuItem>
-            </DropdownMenuGroup> */}
-            {/* <DropdownMenuSeparator /> */}
+              </DropdownMenuItem> */}
+            </DropdownMenuGroup>
+            {/* {/* <DropdownMenuSeparator /> */}
             <DropdownMenuItem className="text-red-500">
               <LogOut />
               Log out

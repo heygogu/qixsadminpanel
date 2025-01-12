@@ -75,25 +75,27 @@ const requests = {
 
 
 const SuperAdmin = {
-  login: (info: any) => requests.post("vendor/login", info),
-  setupCompProfile: (info: any) => requests.post("admin/company", info),
-  imageUpload: (info: any) => requests.post("upload/file", info),
-  getSystems: (search?: any) => requests.get(search ? `system?search=${search}` : "system?limit=200"),
-  changePassword: (info: any) => requests.put("vendor/password", info),
-  profile: (type?: any) => requests.get(type ? `vendor/profile?${type}` : `vendor/profile`),
-  updateProfile: (info: any) => requests.put("vendor/profile", info),
-  contactUS: (info: any) => requests.post("vendor/contact_us", info),
+  login: (info: any) => requests.post("admin/login", info),
+  profile: () => requests.get(`admin/profile`),
+  vendorListing: (q: any) => requests.get(`admin/vendor${q ? `?${q}` : ""}`),
+  vendorDetail: (id: string) => requests.get(`admin/vendor/${id}/workspace`),
+  // setupCompProfile: (info: any) => requests.post("admin/company", info),
+  // imageUpload: (info: any) => requests.post("upload/file", info),
+  // getSystems: (search?: any) => requests.get(search ? `system?search=${search}` : "system?limit=200"),
+  // changePassword: (info: any) => requests.put("vendor/password", info),
+  // updateProfile: (info: any) => requests.put("vendor/profile", info),
+  // contactUS: (info: any) => requests.post("vendor/contact_us", info),
 
 
-  callListing: (q: any) => requests.get(`vendor/call${q ? `?${q}` : ""}`),
-  dashboardCards: (type?: any) => requests.get(type ? `vendor/dashboard?type=${type}` : "vendor/dashboard"),
-  dashboardChatCards: (type?: any) => requests.get(type ? `vendor/dashboard/chat-count?type=${type}` : "vendor/dashboard/chat-count"),
-  getTranscription: (id: string) => requests.get(`vendor/call/${id}/transcript`),
-  callDetail: (id: string) => requests.get(`vendor/call/${id}`),
-  defaultCallData: () => requests.get(`twilio/default-call-data`),
+  // callListing: (q: any) => requests.get(`vendor/call${q ? `?${q}` : ""}`),
+  // dashboardCards: (type?: any) => requests.get(type ? `vendor/dashboard?type=${type}` : "vendor/dashboard"),
+  // dashboardChatCards: (type?: any) => requests.get(type ? `vendor/dashboard/chat-count?type=${type}` : "vendor/dashboard/chat-count"),
+  // getTranscription: (id: string) => requests.get(`vendor/call/${id}/transcript`),
+  // callDetail: (id: string) => requests.get(`vendor/call/${id}`),
+  // defaultCallData: () => requests.get(`twilio/default-call-data`),
 
-  submitPhoneNumber: (info: any) => requests.post(`twilio/send-call-admin`, info),
-  updateCompanyProfile: (info: any) => requests.put(`vendor/profile`, info),
+  // submitPhoneNumber: (info: any) => requests.post(`twilio/send-call-admin`, info),
+  // updateCompanyProfile: (info: any) => requests.put(`vendor/profile`, info),
 };
 
 
