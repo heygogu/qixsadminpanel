@@ -204,7 +204,7 @@ const VendorListing = () => {
 
     const skeletonColumns = vendorColumns.map((column: any) => ({
         ...column,
-        cell: () => <Skeleton className="h-5 bg-primary/10 animate-pulse" />
+        cell: () => <Skeleton className="h-5 bg-gray-200 animate-pulse" />
     }));
 
     const handlePageChange = (page: number) => {

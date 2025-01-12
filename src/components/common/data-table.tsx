@@ -109,7 +109,7 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
-                  className={`${index % 2 === 0 ? 'bg-primary/5' : 'bg-gray-50'} hover:bg-gray-100`}
+                  className={`${index % 2 !== 0 ? 'bg-primary/5' : 'bg-gray-50'} hover:bg-red-300/15`}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className='whitespace-nowrap'>

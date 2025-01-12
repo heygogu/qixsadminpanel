@@ -78,13 +78,13 @@ export function NavSettings({
                                         {item.items.map((subItem) => (
                                             <SidebarMenuSubItem key={subItem.title}>
                                                 <SidebarMenuSubButton asChild>
-                                                    <a
+                                                    <Link
                                                         href={subItem.url}
                                                         className={pathname === subItem.url ? 'font-semibold' : ''}
                                                     >
                                                         <subItem.icon />
                                                         <span>{subItem.title}</span>
-                                                    </a>
+                                                    </Link>
                                                 </SidebarMenuSubButton>
                                             </SidebarMenuSubItem>
                                         ))}
