@@ -116,10 +116,10 @@ const PageManagement = () => {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <Tabs defaultValue="privacy" className="space-y-4">
-                            <TabsList className="grid w-full grid-cols-2">
-                                <TabsTrigger value="privacy">Privacy Policy</TabsTrigger>
-                                <TabsTrigger value="terms">Terms & Conditions</TabsTrigger>
+                        <Tabs defaultValue="privacy" className="space-y-4 ">
+                            <TabsList className="grid w-full grid-cols-2 rounded-full">
+                                <TabsTrigger className='rounded-full' value="privacy">Privacy Policy</TabsTrigger>
+                                <TabsTrigger className='rounded-full' value="terms">Terms & Conditions</TabsTrigger>
                             </TabsList>
 
                             <TabsContent value="privacy" className="space-y-4">
@@ -164,6 +164,7 @@ const PageManagement = () => {
                                             ) : (
                                                 <>
                                                     <ReactQuill
+                                                    
                                                         value={terms}
                                                         onChange={setTerms}
                                                         modules={modules}

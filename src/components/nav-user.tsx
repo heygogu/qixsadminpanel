@@ -59,9 +59,9 @@ export function NavUser({
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-9 w-9 rounded-full border-white border-4 shadow-lg">
+              <Avatar className="h-9 w-9 rounded-full border-primary-foreground border-4 shadow-lg">
                 <AvatarImage className="object-cover" src={henceforthApi?.FILES?.imageOriginal(userInfo?.profile_pic, "")} alt={userInfo?.name} />
-                <AvatarFallback className="rounded-full bg-gray-200">SA</AvatarFallback>
+                <AvatarFallback className="rounded-full bg-secondary">SA</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">{userInfo?.name ?? "Super Admin"}</span>
@@ -78,9 +78,9 @@ export function NavUser({
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-10 w-10 rounded-full border-4 border-white shadow-lg">
+                <Avatar className="h-10 w-10 rounded-full border-4 border-primary-foreground shadow-lg">
                   <AvatarImage src={henceforthApi?.FILES?.imageOriginal(userInfo?.profile_pic, "")} alt={userInfo?.name} />
-                  <AvatarFallback className="rounded-circle bg-gray-200">SA</AvatarFallback>
+                  <AvatarFallback className="rounded-circle bg-secondary">SA</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">{userInfo?.name ?? "Super Admin"}</span>

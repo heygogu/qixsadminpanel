@@ -18,6 +18,7 @@ import {
   useReactTable
 } from '@tanstack/react-table';
 import { ChevronLeftIcon, ChevronRightIcon, Info } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { parseAsInteger, useQueryState } from 'nuqs';
 
 interface DataTableProps<TData, TValue> {
@@ -78,15 +79,16 @@ export function DataTable<TData, TValue>({
     manualPagination: true,
     manualFiltering: true
   });
+  const {theme} = useTheme()
 
   return (
     <div className="">
       <ScrollArea className="h-full rounded-md border border-common md:h-100">
         <Table className="relative">
 
-          <TableHeader className='bg-primary hover:bg-primary whitespace-nowrap'>
+          <TableHeader className='bg-primary focus:bg-primary whitespace-nowrap'>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className='hover:bg-primary'>
+              <TableRow className='hover:bg-primary' key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <TableHead className=' text-white font-semibold' key={header.id}>
                     {header.isPlaceholder ? null : (
@@ -109,7 +111,7 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
-                  className={""}
+                  className={theme==="light" ? `${index % 2 !== 0 ? 'bg-primary/5' : 'bg-gray-50'} hover:bg-red-300/15`:""}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className='whitespace-nowrap'>

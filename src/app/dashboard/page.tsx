@@ -142,7 +142,7 @@ const Dashboard = () => {
         {/* Overview Section */}
         <div className="mb-8 col-span-1">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold text-gray-900">Overview</h2>
+            <h2 className="text-2xl font-semibold">Overview</h2>
             <Select defaultValue="today">
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select timeframe" />
@@ -194,7 +194,7 @@ const Dashboard = () => {
 
         {/* Financial Overview Section */}
         <div className="mb-8">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-6">Financial Overview</h2>
+          <h2 className="text-2xl font-semibold  mb-6">Financial Overview</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <StatsCard
               title="Total Subscriptions"
@@ -269,7 +269,7 @@ const StatsCard = ({ title, value, icon, trend, trendUp, description }) => (
   <Card>
     <CardContent className="pt-6">
       <div className="flex items-center justify-between mb-4">
-        <div className="p-2 bg-gray-100 rounded-lg">
+        <div className="p-2 bg-secondary rounded-lg">
           {icon}
         </div>
         {trend && (

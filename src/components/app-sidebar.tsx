@@ -29,6 +29,7 @@ import {
 import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
 import { NavUser } from "@/components/nav-user"
+import { motion } from "framer-motion";
 // import { TeamSwitcher } from "@/components/team-switcher"
 import ProjectLogo from "@/app/assets/images/project-logo.png"
 import { Moon, Sun } from "lucide-react"
@@ -201,7 +202,7 @@ export function AppSidebar({
 }: {
   children: React.ReactNode;
 }) {
-  const { setTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
   return (
     <SidebarProvider className=''>
 
@@ -229,14 +230,29 @@ export function AppSidebar({
             <div className="flex items-center gap-2 flex-1">
 
             <Breadcrumbs />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button className="ml-auto rounded-full" variant="outline" size="icon">
-                  <Sun className="h-[1.2rem] w-[1.2rem]  rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                  <Moon className="absolute h-[1.2rem]  w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+            {/* <DropdownMenu>
+              <DropdownMenuTrigger asChild> */}
+              
+
+                <Button onClick={() => setTheme(theme === "light" ? "dark" : "light")} className="ml-auto rounded-full" variant="outline" size="icon">
+                  <motion.div
+                    initial={{ rotate: theme === "light" ? 0 : 90, scale: theme === "light" ? 1 : 0 }}
+                    animate={{ rotate: theme === "light" ? 0 : 90, scale: theme === "light" ? 1 : 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <Sun className="h-[1.2rem] w-[1.2rem]" />
+                  </motion.div>
+                  <motion.div
+                    initial={{ rotate: theme === "light" ? -90 : 0, scale: theme === "light" ? 0 : 1 }}
+                    animate={{ rotate: theme === "light" ? -90 : 0, scale: theme === "light" ? 0 : 1 }}
+                    transition={{ duration: 0.3 }}
+                    className="absolute"
+                  >
+                    <Moon className="h-[1.2rem] w-[1.2rem]" />
+                  </motion.div>
                   <span className="sr-only">Toggle theme</span>
                 </Button>
-              </DropdownMenuTrigger>
+              {/* </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={() => setTheme("light")}>
                   Light
@@ -248,7 +264,7 @@ export function AppSidebar({
                   System
                 </DropdownMenuItem>
               </DropdownMenuContent>
-            </DropdownMenu>
+            </DropdownMenu> */}
             </div>
           </div>
         </header>

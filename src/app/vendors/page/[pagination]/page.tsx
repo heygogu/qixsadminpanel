@@ -135,7 +135,7 @@ const vendorColumns: ColumnDef<Vendor>[] = [
         header: "Actions",
         cell: ({ row }) => (
             <div className="flex gap-2">
-                <Link href={`/vendors/${row.original._id}`} passHref>
+                <Link href={`/vendors/${row.original._id}/view`} passHref>
                     <Button variant="ghost" size="icon">
                         <Eye className="h-4 w-4" />
                     </Button>

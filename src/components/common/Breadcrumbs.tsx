@@ -26,6 +26,8 @@ export default function Breadcrumbs() {
                 <span className="mx-2">/</span> {/* Separator */}
             </BreadcrumbItem>}
             {segments.map((segment, index) => {
+                if (segment.length > 23) return null;
+
                 const href = `/${segments.slice(0, index + 1).join('/')}`;
                 const label = segment.replace(/\[|\]/g, ''); // Remove square brackets from dynamic routes
 
