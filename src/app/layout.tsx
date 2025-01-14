@@ -12,6 +12,7 @@ import HolyLoader from "holy-loader";
 import "./globals.css";
 import { redirect } from 'next/navigation';
 import favicon from "@/app/assets/images/favicon.ico";
+import { ThemeProvider } from '@/components/theme-provider';
 
 interface UserInfo {
   // Define the properties of UserInfo based on the expected structure
@@ -70,8 +71,14 @@ export default async function RootLayout({
 
         <GlobalProvider userInfo={userInfo}>
           <NuqsAdapter>
-
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem
+            disableTransitionOnChange
+          >
             {children}
+          </ThemeProvider>
             <HolyLoader
               color="#7820cf"
               height="2px"
