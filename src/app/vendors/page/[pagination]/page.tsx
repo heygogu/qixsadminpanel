@@ -204,7 +204,7 @@ const VendorListing = () => {
 
     const skeletonColumns = vendorColumns.map((column: any) => ({
         ...column,
-        cell: () => <Skeleton className="h-5 bg-gray-200 animate-pulse" />
+        cell: () => <Skeleton className="h-5 p-3 bg-gray-200 animate-pulse" />
     }));
 
     const handlePageChange = (page: number) => {
@@ -284,7 +284,7 @@ const VendorListing = () => {
                                 isLoading ? (
                                     <DataTable
                                         columns={skeletonColumns}
-                                        data={Array.from({ length: 8 })}
+                                        data={Array.from({ length: 10 })}
                                         totalItems={10}
                                     />
                                 ) : (
