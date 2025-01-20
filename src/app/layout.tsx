@@ -71,14 +71,14 @@ export default async function RootLayout({
 
         <GlobalProvider userInfo={userInfo}>
           <NuqsAdapter>
-          <ThemeProvider
+          {/* <ThemeProvider
             attribute="class"
             // defaultTheme="light"
             enableSystem
             disableTransitionOnChange
-          >
+          > */}
             {children}
-          </ThemeProvider>
+          {/* </ThemeProvider> */}
             <HolyLoader
               color="#7820cf"
               height="2px"

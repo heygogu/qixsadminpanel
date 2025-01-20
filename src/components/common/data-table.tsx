@@ -86,7 +86,7 @@ export function DataTable<TData, TValue>({
       <ScrollArea className="h-full rounded-md border border-common md:h-100">
         <Table className="relative">
 
-          <TableHeader className='bg-primary focus:bg-primary whitespace-nowrap'>
+          <TableHeader className='bg-primary/100 focus:bg-primary whitespace-nowrap'>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow className='hover:bg-primary' key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
@@ -111,7 +111,7 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
-                  className={theme==="light" ? `${index % 2 !== 0 ? 'bg-primary/5' : 'bg-gray-50'} hover:bg-red-300/15`:""}
+                  className={`${index % 2 !== 0 ? 'bg-primary/5' : 'bg-gray-50'} hover:bg-red-300/5`}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className='whitespace-nowrap'>

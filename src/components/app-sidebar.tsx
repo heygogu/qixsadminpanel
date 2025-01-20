@@ -234,7 +234,7 @@ export function AppSidebar({
               <DropdownMenuTrigger asChild> */}
               
 
-                <Button onClick={() => setTheme(theme === "light" ? "dark" : "light")} className="ml-auto rounded-full" variant="outline" size="icon">
+                {/* <Button onClick={() => setTheme(theme === "light" ? "dark" : "light")} className="ml-auto rounded-full" variant="outline" size="icon">
                   <motion.div
                     initial={{ rotate: theme === "light" ? 0 : 90, scale: theme === "light" ? 1 : 0 }}
                     animate={{ rotate: theme === "light" ? 0 : 90, scale: theme === "light" ? 1 : 0 }}
@@ -251,7 +251,7 @@ export function AppSidebar({
                     <Moon className="h-[1.2rem] w-[1.2rem]" />
                   </motion.div>
                   <span className="sr-only">Toggle theme</span>
-                </Button>
+                </Button> */}
               {/* </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={() => setTheme("light")}>
