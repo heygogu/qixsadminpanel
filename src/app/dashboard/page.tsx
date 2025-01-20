@@ -282,9 +282,9 @@ const StatsCard = ({ title, value, icon, trend, trendUp, description }) => (
       <div className="space-y-1">
         <p className="text-sm font-medium text-gray-500">{title}</p>
         <p className="text-2xl font-bold">{value}</p>
-        {description && (
+        {/* {description && (
           <p className="text-xs text-gray-500">{description}</p>
-        )}
+        )} */}
       </div>
     </CardContent>
   </Card>
