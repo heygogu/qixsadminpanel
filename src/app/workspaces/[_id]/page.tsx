@@ -123,7 +123,10 @@ const WorkspaceModule = () => {
   const params = useParams();
 
   const fetchWorkspaceMembers = async () => {
-    workSpaceMembers.loading = true;
+    setWorkSpaceDetails({
+      ...workSpaceMembers,
+      loading: true,
+    });
     try {
       let urlSearchParams = new URLSearchParams();
       if (searchParams.get("memberPage")) {
@@ -144,12 +147,18 @@ const WorkspaceModule = () => {
       });
     } catch (error) {
     } finally {
-      workSpaceMembers.loading = false;
+      setWorkSpaceDetails({
+        ...workSpaceMembers,
+        loading: false,
+      });
     }
   };
 
   const fetchSubscriptionData = async () => {
-    subscriptionData.loading = true;
+    setSubscriptionData({
+      ...subscriptionData,
+      loading: true,
+    });
     try {
       let urlSearchParams = new URLSearchParams();
       if (searchParams.get("subscriptionPage")) {
@@ -166,7 +175,10 @@ const WorkspaceModule = () => {
         );
     } catch (error) {
     } finally {
-      subscriptionData.loading = false;
+      setSubscriptionData({
+        ...subscriptionData,
+        loading: false,
+      });
     }
   };
 
