@@ -1,19 +1,19 @@
-"use client"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import LoginImage from "@/app/assets/images/sidelogin.jpg"
-import Image from "next/image"
-import React from "react"
-import { Eye, EyeOff, Loader2 } from "lucide-react"
-import ProjectIcon from "@/app/assets/images/qixsnobg.svg"
-import henceforthApi from "@/app/utils/henceforthApis"
-import { useGlobalContext } from "@/app/providers/Provider"
-import { useRouter } from "next/navigation"
-import { setCookie } from "nookies"
-import path from "path"
+"use client";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import LoginImage from "@/app/assets/images/sidelogin.jpg";
+import Image from "next/image";
+import React from "react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import ProjectIcon from "@/app/assets/images/qixsnobg.svg";
+import henceforthApi from "@/app/utils/henceforthApis";
+import { useGlobalContext } from "@/app/providers/Provider";
+import { useRouter } from "next/navigation";
+import { setCookie } from "nookies";
+import path from "path";
 interface AdminInfo {
   _id: string;
   email: string;
@@ -29,41 +29,42 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-
   // const [userInfo, setUserInfo] = React.useState<AdminInfo | null>(null)
-  const { getProfile, Toast } = useGlobalContext()
-  const router = useRouter()
-  const [password, setPassword] = React.useState("qwerty")
-  const [showPassword, setShowPassword] = React.useState(false)
-  const [isLoading, setIsLoading] = React.useState(false)
-
+  const { getProfile, Toast } = useGlobalContext();
+  const router = useRouter();
+  const [password, setPassword] = React.useState("qwerty");
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
     const payload = {
       email: e.currentTarget.email.value,
-      password: e.currentTarget.password.value
-    }
+      password: e.currentTarget.password.value,
+    };
     try {
       const apiRes = await henceforthApi.SuperAdmin.login(payload);
       // setUserInfo(apiRes?.data)
       if (apiRes?.data?.access_token) {
-        henceforthApi.setToken(apiRes?.data?.access_token)
-        setCookie(null, "COOKIES_ADMIN_ACCESS_TOKEN", apiRes?.data?.access_token, {
-          maxAge: 30 * 24 * 60 * 60,
-          path: "/",
-        })
-        await getProfile()
-        router.replace("/dashboard")
-
+        henceforthApi.setToken(apiRes?.data?.access_token);
+        setCookie(
+          null,
+          "COOKIES_ADMIN_ACCESS_TOKEN",
+          apiRes?.data?.access_token,
+          {
+            maxAge: 30 * 24 * 60 * 60,
+            path: "/",
+          }
+        );
+        // await getProfile()
+        router.replace("/dashboard");
       }
     } catch (error) {
-      Toast.error(error)
+      Toast.error(error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-
   }
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -72,7 +73,12 @@ export function LoginForm({
           <form onSubmit={handleLogin} className="p-6 md:p-8">
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
-                <Image src={ProjectIcon.src} width={90} height={90} alt="project logo"></Image>
+                <Image
+                  src={ProjectIcon.src}
+                  width={90}
+                  height={90}
+                  alt="project logo"
+                ></Image>
                 <h1 className="text-2xl font-bold">Welcome back</h1>
                 <p className="text-balance text-muted-foreground">
                   Login to your QIXS account
@@ -122,13 +128,17 @@ export function LoginForm({
                 </div>
               </div>
               <Button type="submit" className="w-full">
-                {isLoading && <Loader2 className="w-5 h-5 animate-spin" />} Login
+                {isLoading && <Loader2 className="w-5 h-5 animate-spin" />}{" "}
+                Login
               </Button>
-
             </div>
           </form>
           <div className="relative hidden bg-muted md:block">
-            <Image src={LoginImage} alt="login-image" className="h-full"></Image>
+            <Image
+              src={LoginImage}
+              alt="login-image"
+              className="h-full"
+            ></Image>
           </div>
         </CardContent>
       </Card>
@@ -137,5 +147,5 @@ export function LoginForm({
         and <a href="#">Privacy Policy</a>.
       </div>
     </div>
-  )
+  );
 }

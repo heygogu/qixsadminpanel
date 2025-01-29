@@ -5,7 +5,7 @@ import _superagent from "superagent";
 const SuperagentPromise = require("superagent-promise");
 const superagent = SuperagentPromise(_superagent, global.Promise);
 
-export const API_ROOT = "https://dev.qixs.ai:3003/";
+export const API_ROOT = "http://192.168.1.44:3001/";
 export const BUCKET_ROOT =
   "https://demoserver3.sgp1.digitaloceanspaces.com/uploads/images";
 export const PINECONE_ROOT = "https://dev.qixs.ai:3003/";
@@ -79,7 +79,9 @@ const SuperAdmin = {
   login: (info: any) => requests.post("admin/login", info),
   profile: () => requests.get(`admin/profile`),
   vendorListing: (q: any) => requests.get(`admin/vendor${q ? `?${q}` : ""}`),
-  vendorDetail: (id: string) => requests.get(`admin/vendor/${id}/workspace`),
+  vendorDetail: (id: string) => requests.get(`admin/vendor/${id}`),
+  toogleVendorStatus: (id: string, status: string) =>
+    requests.patch(`admin/vendor/${id}/block?status=${status}`, {}),
 
   //workspaces
   workspaceListing: (q: any) =>
