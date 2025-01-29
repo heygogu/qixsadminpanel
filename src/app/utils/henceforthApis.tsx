@@ -5,7 +5,7 @@ import _superagent from "superagent";
 const SuperagentPromise = require("superagent-promise");
 const superagent = SuperagentPromise(_superagent, global.Promise);
 
-export const API_ROOT = "http://192.168.1.44:3001/";
+export const API_ROOT = "https://dev.qixs.ai:3003/";
 export const BUCKET_ROOT =
   "https://demoserver3.sgp1.digitaloceanspaces.com/uploads/images";
 export const PINECONE_ROOT = "https://dev.qixs.ai:3003/";
