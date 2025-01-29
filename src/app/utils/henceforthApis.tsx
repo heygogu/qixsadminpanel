@@ -6,9 +6,9 @@ const SuperagentPromise = require("superagent-promise");
 const superagent = SuperagentPromise(_superagent, global.Promise);
 
 export const API_ROOT = "https://dev.qixs.ai:3003/";
-export const BUCKET_ROOT = "https://demoserver3.sgp1.digitaloceanspaces.com/uploads/images";
-export const PINECONE_ROOT = "https://dev.qixs.ai:3003/"
-
+export const BUCKET_ROOT =
+  "https://demoserver3.sgp1.digitaloceanspaces.com/uploads/images";
+export const PINECONE_ROOT = "https://dev.qixs.ai:3003/";
 
 const API_FILE_ROOT_MEDIUM = `${BUCKET_ROOT}/medium/`;
 const API_FILE_ROOT_ORIGINAL = `${BUCKET_ROOT}/original/`;
@@ -31,8 +31,12 @@ const tokenPlugin = (req: any) => {
 
 const requests = {
   del: (url: string, body: string) =>
-    superagent.del(`${API_ROOT}${url}`, body).use(tokenPlugin).then(responseBody),
-  deleteOne: (url: string) => superagent.del(`${API_ROOT}${url}`).use(tokenPlugin).then(responseBody),
+    superagent
+      .del(`${API_ROOT}${url}`, body)
+      .use(tokenPlugin)
+      .then(responseBody),
+  deleteOne: (url: string) =>
+    superagent.del(`${API_ROOT}${url}`).use(tokenPlugin).then(responseBody),
   delMultiple: (url: string, body: any) =>
     superagent
       .del(`${API_ROOT}${url}`, body)
@@ -71,36 +75,24 @@ const requests = {
   },
 };
 
-
-
-
 const SuperAdmin = {
   login: (info: any) => requests.post("admin/login", info),
   profile: () => requests.get(`admin/profile`),
   vendorListing: (q: any) => requests.get(`admin/vendor${q ? `?${q}` : ""}`),
   vendorDetail: (id: string) => requests.get(`admin/vendor/${id}/workspace`),
-  // setupCompProfile: (info: any) => requests.post("admin/company", info),
-  // imageUpload: (info: any) => requests.post("upload/file", info),
-  // getSystems: (search?: any) => requests.get(search ? `system?search=${search}` : "system?limit=200"),
-  // changePassword: (info: any) => requests.put("vendor/password", info),
-  // updateProfile: (info: any) => requests.put("vendor/profile", info),
-  // contactUS: (info: any) => requests.post("vendor/contact_us", info),
 
+  //workspaces
+  workspaceListing: (q: any) =>
+    requests.get(`admin/workspace${q ? `?${q}` : ""}`),
+  getWorkspaceMembersListing: (id: string, q: any) =>
+    requests.get(`admin/workspace/${id}/users${q ? `?${q}` : ""}`),
+  getWorkspaceSubscriptionListing: (id: string, q: any) =>
+    requests.get(`admin/workspace/${id}/subscription${q ? `?${q}` : ""}`),
 
-  // callListing: (q: any) => requests.get(`vendor/call${q ? `?${q}` : ""}`),
-  // dashboardCards: (type?: any) => requests.get(type ? `vendor/dashboard?type=${type}` : "vendor/dashboard"),
-  // dashboardChatCards: (type?: any) => requests.get(type ? `vendor/dashboard/chat-count?type=${type}` : "vendor/dashboard/chat-count"),
-  // getTranscription: (id: string) => requests.get(`vendor/call/${id}/transcript`),
-  // callDetail: (id: string) => requests.get(`vendor/call/${id}`),
-  // defaultCallData: () => requests.get(`twilio/default-call-data`),
-
-  // submitPhoneNumber: (info: any) => requests.post(`twilio/send-call-admin`, info),
-  // updateCompanyProfile: (info: any) => requests.put(`vendor/profile`, info),
+  workspaceDetails: (id: string) => requests.get(`admin/workspace/${id}`),
+  toggleWorkspaceStatus: (id: string, status: string) =>
+    requests.put(`admin/workspace/${id}/block?status=${status}`, {}),
 };
-
-
-
-
 
 const Auth = {
   login: (info: any) => requests.post("user/login", info),
@@ -124,8 +116,6 @@ const Auth = {
   resetPassword: (info: any) => requests.put("user/reset/password", info),
   edit: (info: any) => requests.put("user/profile", info),
 };
-
-
 
 const FILES = {
   audio: (filename: string) =>

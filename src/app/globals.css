@@ -39,6 +39,12 @@ body {
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: var(--primary);
+    --sidebar-accent: 240 60.8% 95.9%;
+    --sidebar-accent-foreground: var(--primary);
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
     /* --sidebar-background:220 14.3% 95.9%; */
   }
 
@@ -79,9 +85,7 @@ body {
   }
 }
 
-
 .focus-visible\:ring-offset-2:focus-visible,
 .focus\:ring-offset-2:focus {
-  --tw-ring-offset-width: 0px !important; 
+  --tw-ring-offset-width: 0px !important;
 }
-
