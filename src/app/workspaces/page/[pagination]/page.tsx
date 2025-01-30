@@ -20,7 +20,7 @@ import {
 import PageContainer from "@/components/layouts/page-container";
 import DashboardLayout from "@/components/layouts/dashboard-layout";
 import Link from "next/link";
-import henceforthApi from "@/app/utils/henceforthApis";
+import henceforthApi from "@/utils/henceforthApis";
 import { useParams, useSearchParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import {

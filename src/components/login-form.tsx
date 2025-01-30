@@ -9,7 +9,7 @@ import Image from "next/image";
 import React from "react";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import ProjectIcon from "@/app/assets/images/qixsnobg.svg";
-import henceforthApi from "@/app/utils/henceforthApis";
+import henceforthApi from "@/utils/henceforthApis";
 import { useGlobalContext } from "@/app/providers/Provider";
 import { useRouter } from "next/navigation";
 import { setCookie } from "nookies";

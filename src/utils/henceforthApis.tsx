@@ -78,6 +78,8 @@ const requests = {
 const SuperAdmin = {
   login: (info: any) => requests.post("admin/login", info),
   profile: () => requests.get(`admin/profile`),
+
+  //vendors
   vendorListing: (q: any) => requests.get(`admin/vendor${q ? `?${q}` : ""}`),
   vendorDetail: (id: string) => requests.get(`admin/vendor/${id}`),
   toogleVendorStatus: (id: string, status: string) =>
@@ -94,6 +96,37 @@ const SuperAdmin = {
   workspaceDetails: (id: string) => requests.get(`admin/workspace/${id}`),
   toggleWorkspaceStatus: (id: string, status: string) =>
     requests.put(`admin/workspace/${id}/block?status=${status}`, {}),
+
+  //imageupload
+  imageUpload: (info: any) => requests.post("upload/file", info),
+
+  //knowledgebase
+  getKnowledgeBases: (q?: any) =>
+    requests.get(`knowledge-base${q ? `?${q}` : ""}`),
+
+  //agent-templates
+  addAgentTemplate: (info: any) => requests.post("agent-template", info),
+  agentTemplateListing: (q: any) =>
+    requests.get(`agent-template${q ? `?${q}` : ""}`),
+  getAgentTemplateDetails: (id: string) => requests.get(`agent-template/${id}`),
+  updateAgentTemplate: (id: string, info: any) =>
+    requests.put(`agent-template/${id}`, info),
+
+  //website-testing
+  websiteTesting: (info: any) => requests.put("agent/default/web", info),
+  websiteTestingListing: (q?: any) =>
+    requests.get(`agent/default/web${q ? `?${q}` : ""}`),
+
+  //call testing
+  defaultCallData: () => requests.get(`twilio/default-call-data`),
+  callTesting: (info: any) => requests.post("twilio/send-call-admin", info),
+
+  //keylisitng
+  keyListing: (id: any) => requests.get(`vendor/workspace/${id}/key`),
+
+  //whitelist data
+  whiteLabelListing: (q?: any) =>
+    requests.get(`admin/white-label${q ? `?${q}` : ""}`),
 };
 
 const Auth = {

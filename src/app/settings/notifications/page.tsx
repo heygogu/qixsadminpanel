@@ -1,199 +1,288 @@
-"use client"
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
-import PageContainer from '@/components/layouts/page-container';
-import DashboardLayout from '@/components/layouts/dashboard-layout';
+"use client";
+
+import React from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 import {
-    Bell,
-    Mail,
-    MessageSquare,
-    Phone,
-    Globe,
-    AlertCircle,
-    Save,
-    Settings,
-    RefreshCcw,
-} from "lucide-react";
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import MultipleSelector from "@/components/common/AsyncMultiSelect";
+import { SendIcon } from "lucide-react";
+import DashboardLayout from "@/components/layouts/dashboard-layout";
+import PageContainer from "@/components/layouts/page-container";
+import { cn } from "@/lib/utils";
+import { Label } from "@/components/ui/label";
+
+// Validation schema
+const notificationSchema = z.object({
+  userType: z.enum(["vendors", "selectedVendors"]),
+  notificationType: z.enum(["email", "sms", "web"]),
+  selectedUsers: z
+    .array(
+      z.object({
+        label: z.string(),
+        value: z.string(),
+      })
+    )
+    .optional(),
+  title: z.string().min(1, "Title is required"),
+  description: z.string().min(1, "Description is required"),
+});
+
+// Mock data for vendors and members
+const MOCK_VENDORS = [
+  { label: "Vendor 1", value: "vendor1" },
+  { label: "Vendor 2", value: "vendor2" },
+  { label: "Vendor 3", value: "vendor3" },
+];
 
 const NotificationSettings = () => {
-    const [hasChanges, setHasChanges] = React.useState(false);
-    const [saving, setSaving] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
 
-    const handleChange = () => {
-        setHasChanges(true);
-    };
+  const form = useForm<z.infer<typeof notificationSchema>>({
+    resolver: zodResolver(notificationSchema),
+    defaultValues: {
+      userType: "vendors",
+      notificationType: "email",
+      selectedUsers: [],
+      title: "",
+      description: "",
+    },
+  });
 
-    const handleSave = async () => {
-        setSaving(true);
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        setHasChanges(false);
-        setSaving(false);
-    };
+  const userType = form.watch("userType");
 
-    return (
-        <div className="container mx-auto space-y-6">
-            <Card>
-                <CardHeader>
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <Bell className="h-6 w-6" />
-                            <div>
-                                <CardTitle>Notification Settings</CardTitle>
-                                <CardDescription>Manage how you receive notifications</CardDescription>
-                            </div>
-                        </div>
-                        {hasChanges && (
-                            <Badge variant="secondary" className="flex items-center gap-1">
-                                <AlertCircle className="h-3 w-3" />
-                                Unsaved Changes
-                            </Badge>
-                        )}
-                    </div>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                    {/* Email Notifications */}
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                                    <Mail className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                                </div>
-                                <div>
-                                    <h3 className="font-medium">Email Notifications</h3>
-                                    <p className="text-sm text-gray-500">Receive updates via email</p>
-                                </div>
-                            </div>
-                            <Switch onCheckedChange={handleChange} defaultChecked />
-                        </div>
-                        <div className="ml-12 space-y-3">
-                            <div className="flex items-center justify-between">
-                                <Label className="text-sm">New ticket updates</Label>
-                                <Switch onCheckedChange={handleChange} defaultChecked />
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <Label className="text-sm">Account activity</Label>
-                                <Switch onCheckedChange={handleChange} defaultChecked />
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <Label className="text-sm">Newsletter</Label>
-                                <Switch onCheckedChange={handleChange} />
-                            </div>
-                        </div>
-                    </div>
+  type Option = { label: string; value: string };
 
-                    <Separator />
+  const mockSearch = async (value: string): Promise<Option[]> => {
+    // Simulate API call
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const filtered = MOCK_VENDORS.filter((option) =>
+          option.label.toLowerCase().includes(value.toLowerCase())
+        );
+        resolve(filtered);
+      }, 500);
+    });
+  };
 
-                    {/* SMS Notifications */}
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
-                                    <Phone className="h-5 w-5 text-green-600 dark:text-green-400" />
-                                </div>
-                                <div>
-                                    <h3 className="font-medium">SMS Notifications</h3>
-                                    <p className="text-sm text-gray-500">Get notified via text message</p>
-                                </div>
-                            </div>
-                            <Switch onCheckedChange={handleChange} />
-                        </div>
-                        <div className="ml-12 space-y-3">
-                            <div className="flex items-center justify-between">
-                                <Label className="text-sm">Security alerts</Label>
-                                <Switch onCheckedChange={handleChange} defaultChecked />
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <Label className="text-sm">Payment confirmations</Label>
-                                <Switch onCheckedChange={handleChange} />
-                            </div>
-                        </div>
-                    </div>
+  const onSubmit = async (data: z.infer<typeof notificationSchema>) => {
+    setIsLoading(true);
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      console.log("Form submitted:", data);
+      form.reset();
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-                    <Separator />
+  return (
+    <PageContainer>
+      <div className="grid grid-cols-1 col-span-1">
+        <div
+          className={cn(
+            "animate-in fade-in-50 duration-500 col-span-12",
+            "slide-in-from-bottom-5"
+          )}
+        >
+          <Card className="">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <SendIcon className="h-6 w-6" />
+                <CardTitle>Send Notifications</CardTitle>
+              </div>
+              <CardDescription>
+                Configure and send notifications to users
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-8"
+                >
+                  <FormField
+                    control={form.control}
+                    name="userType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Select Users</FormLabel>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="grid lg:grid-cols-8 grid-cols-2 "
+                          >
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="vendors" id="vendors" />
+                              <label htmlFor="vendors">All Vendors</label>
+                            </div>
 
-                    {/* Web Notifications */}
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
-                                    <Globe className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                                </div>
-                                <div>
-                                    <h3 className="font-medium">Web Notifications</h3>
-                                    <p className="text-sm text-gray-500">Browser notifications</p>
-                                </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem
+                                value="selectedVendors"
+                                id="selectedVendors"
+                              />
+                              <label htmlFor="selectedVendors">
+                                Selected Vendors
+                              </label>
                             </div>
-                            <Switch onCheckedChange={handleChange} defaultChecked />
-                        </div>
-                        <div className="ml-12 space-y-3">
-                            <div className="flex items-center justify-between">
-                                <Label className="text-sm">New messages</Label>
-                                <Switch onCheckedChange={handleChange} defaultChecked />
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <Label className="text-sm">Task updates</Label>
-                                <Switch onCheckedChange={handleChange} defaultChecked />
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <Label className="text-sm">System alerts</Label>
-                                <Switch onCheckedChange={handleChange} />
-                            </div>
-                        </div>
-                    </div>
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                    <Alert className="mt-6 bg-blue-50 dark:bg-blue-950">
-                        <MessageSquare className="h-4 w-4" />
-                        <AlertDescription>
-                            Changes to notification settings may take a few minutes to apply across all systems.
-                        </AlertDescription>
-                    </Alert>
+                  {userType === "selectedVendors" && (
+                    <FormField
+                      control={form.control}
+                      name="selectedUsers"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Select Vendors</FormLabel>
+                          <FormControl>
+                            <MultipleSelector
+                              value={field.value}
+                              onChange={field.onChange}
+                              defaultOptions={MOCK_VENDORS}
+                              onSearch={async (value) => {
+                                // setIsTriggered(true);
+                                const res = await mockSearch(value);
+                                // setIsTriggered(false);
+                                return res;
+                              }}
+                              placeholder={`Search ${
+                                userType === "selectedVendors"
+                                  ? "vendors"
+                                  : "members"
+                              }...`}
+                              loadingIndicator={
+                                <p className="py-2 text-center text-muted-foreground">
+                                  Loading...
+                                </p>
+                              }
+                              emptyIndicator={
+                                <p className="py-2 text-center text-muted-foreground">
+                                  No results found
+                                </p>
+                              }
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
 
-                    <div className="flex justify-end gap-3 pt-4">
-                        <Button
-                            variant="outline"
-                            onClick={() => window.location.reload()}
-                            disabled={!hasChanges || saving}
-                        >
-                            <RefreshCcw className="h-4 w-4 mr-2" />
-                            Reset
-                        </Button>
-                        <Button
-                            onClick={handleSave}
-                            disabled={!hasChanges || saving}
-                            className="gap-2"
-                        >
-                            {saving ? (
-                                <>
-                                    <Settings className="h-4 w-4 animate-spin" />
-                                    Saving...
-                                </>
-                            ) : (
-                                <>
-                                    <Save className="h-4 w-4" />
-                                    Save Changes
-                                </>
-                            )}
-                        </Button>
-                    </div>
-                </CardContent>
-            </Card>
+                  <FormField
+                    control={form.control}
+                    name="notificationType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Notification Type</FormLabel>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex space-x-4"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="email" id="email" />
+                              <label htmlFor="email">Email</label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="sms" id="sms" />
+                              <label htmlFor="sms">SMS</label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="web" id="web" />
+                              <label htmlFor="web">Web</label>
+                            </div>
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div>
+                    <Label>Title</Label>
+
+                    <FormField
+                      control={form.control}
+                      name="title"
+                      render={({ field }) => (
+                        <FormItem>
+                          {/* <FormLabel>Title</FormLabel> */}
+                          <FormControl>
+                            <Input
+                              placeholder="Notification title"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div>
+                    <Label>Description</Label>
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Write description here..."
+                              className="min-h-[100px]"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <Button type="submit" className="" disabled={isLoading}>
+                    {isLoading ? "Sending..." : "Send Notification"}
+                  </Button>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
         </div>
-    );
+      </div>
+    </PageContainer>
+  );
 };
 
-export default function DashboardPage() {
-    return (
-        <DashboardLayout>
-            <PageContainer>
-                <NotificationSettings />
-            </PageContainer>
-        </DashboardLayout>
-    );
-};
+export default function NotificationPage() {
+  return (
+    <DashboardLayout>
+      <NotificationSettings />
+    </DashboardLayout>
+  );
+}

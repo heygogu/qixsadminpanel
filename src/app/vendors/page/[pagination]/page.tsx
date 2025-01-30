@@ -32,7 +32,7 @@ import DashboardLayout from "@/components/layouts/dashboard-layout";
 import PageContainer from "@/components/layouts/page-container";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import henceforthApi from "@/app/utils/henceforthApis";
+import henceforthApi from "@/utils/henceforthApis";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ColumnDef } from "@tanstack/react-table";
 import PaginationCompo from "@/components/common/Pagination";

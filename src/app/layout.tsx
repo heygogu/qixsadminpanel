@@ -3,7 +3,7 @@ import { Poppins } from "next/font/google";
 
 import "./globals.css";
 import { GlobalProvider } from "@/app/providers/Provider";
-import henceforthApi from "@/app/utils/henceforthApis";
+import henceforthApi from "@/utils/henceforthApis";
 import { cookies } from "next/headers";
 import { Toaster } from "react-hot-toast";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
@@ -11,7 +11,6 @@ import HolyLoader from "holy-loader";
 import "./globals.css";
 import { redirect } from "next/navigation";
 import favicon from "@/app/assets/images/favicon.ico";
-import { ThemeProvider } from "@/components/theme-provider";
 
 interface UserInfo {
   // Define the properties of UserInfo based on the expected structure
@@ -31,7 +30,7 @@ export const metadata: Metadata = {
 
 const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["500", "600", "700"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 export default async function RootLayout({
@@ -63,14 +62,8 @@ export default async function RootLayout({
       <body className="overflow-hidden">
         <GlobalProvider userInfo={userInfo}>
           <NuqsAdapter>
-            {/* <ThemeProvider
-            attribute="class"
-            // defaultTheme="light"
-            enableSystem
-            disableTransitionOnChange
-          > */}
             {children}
-            {/* </ThemeProvider> */}
+
             <HolyLoader
               color="#7820cf"
               height="2px"

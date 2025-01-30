@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   AudioWaveform,
   Command,
@@ -14,8 +14,6 @@ import {
   BotIcon,
   ShoppingBag,
   UsersRound,
-
-
   CreditCard,
   UserRoundPen,
   Ticket,
@@ -23,25 +21,26 @@ import {
   Users2,
   BellIcon,
   PaperclipIcon,
-  FileCheck
-} from "lucide-react"
+  FileCheck,
+  Building2,
+} from "lucide-react";
 
-import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
-import { NavUser } from "@/components/nav-user"
+import { NavMain } from "@/components/nav-main";
+import { NavProjects } from "@/components/nav-projects";
+import { NavUser } from "@/components/nav-user";
 import { motion } from "framer-motion";
 // import { TeamSwitcher } from "@/components/team-switcher"
-import ProjectLogo from "@/app/assets/images/project-logo.png"
-import { Moon, Sun } from "lucide-react"
-import { useTheme } from "next-themes"
+import ProjectLogo from "@/app/assets/images/project-logo.png";
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   Sidebar,
   SidebarContent,
@@ -52,11 +51,20 @@ import {
   SidebarRail,
   SidebarSeparator,
   SidebarTrigger,
-} from "@/components/ui/sidebar"
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "./ui/breadcrumb"
-import Image from "next/image"
-import { NavSettings } from "./nav-settings"
-import Breadcrumbs from "./common/Breadcrumbs"
+} from "@/components/ui/sidebar";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "./ui/breadcrumb";
+import Image from "next/image";
+import { NavSettings } from "./nav-settings";
+import Breadcrumbs from "./common/Breadcrumbs";
+import { NavTest } from "./nav-testing";
+import { ScrollArea } from "./ui/scroll-area";
 
 // This is sample data.
 const data = {
@@ -65,35 +73,18 @@ const data = {
     email: "m@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
+
   navMain: [
     {
       title: "Dashboard",
       url: "/dashboard",
       icon: LayoutDashboard,
       isActive: true,
-
     },
     {
       title: "Workspaces",
       url: "/workspaces/page/1",
-      icon: ShoppingBag,
+      icon: Building2,
       // items: [
       //   {
       //     title: "Genesis",
@@ -136,35 +127,40 @@ const data = {
       title: "Accounting",
       url: "/accounting/page/1",
       icon: UserRoundPen,
-      // items: [
-      //   {
-      //     title: "General",
-      //     url: "#",
-      //   },
-      //   {
-      //     title: "Team",
-      //     url: "#",
-      //   },
-      //   {
-      //     title: "Billing",
-      //     url: "#",
-      //   },
-      //   {
-      //     title: "Limits",
-      //     url: "#",
-      //   },
-      // ],
     },
-
+    {
+      title: "AI Agents",
+      url: "/ai-agents/page/1",
+      icon: BotIcon,
+    },
   ],
   projects: [
     {
-      name: "Ticket Management",
+      title: "Ticket Management",
       url: "/ticket-management/page/1",
       icon: TicketCheck,
-      items: []
+      items: [],
     },
-
+    {
+      title: "White Label Leads",
+      url: "/white-label-leads/page/1",
+      icon: ShoppingBag,
+      items: [],
+    },
+  ],
+  testing: [
+    {
+      title: "Website Testing",
+      url: "/website-testing",
+      icon: TestTube2,
+      items: [],
+    },
+    {
+      title: "Call Testing",
+      url: "/call-testing",
+      icon: PhoneIncoming,
+      items: [],
+    },
   ],
   settings: [
     {
@@ -175,48 +171,51 @@ const data = {
         {
           title: "Page Management",
           url: "/settings/page-management",
-          icon: FileCheck
+          icon: FileCheck,
         },
         {
           title: "Staff",
           url: "/settings/staff/page/1",
-          icon: UserRoundPen
+          icon: UserRoundPen,
         },
         {
           title: "Notifications ",
           url: "/settings/notifications",
           icon: BellIcon,
-        }
-      ]
-    }
-
+        },
+      ],
+    },
   ],
   currentPage: {
     parent: "Home",
     title: "Dashboard",
   },
-}
+};
 
-export function AppSidebar({
-  children
-}: {
-  children: React.ReactNode;
-}) {
-  const { theme, setTheme } = useTheme()
+export function AppSidebar({ children }: { children: React.ReactNode }) {
+  const { theme, setTheme } = useTheme();
   return (
-    <SidebarProvider className=''>
-
-      <Sidebar collapsible="icon" >
+    <SidebarProvider>
+      <Sidebar className="  " collapsible="icon">
         <SidebarHeader className="flex items-center justify-center mt-2">
           {/* <TeamSwitcher teams={data.teams} /> */}
-          <Image src={ProjectLogo} height={100} width={200} alt="Project Logo" className="" ></Image>
+          <Image
+            src={ProjectLogo}
+            height={100}
+            width={200}
+            alt="Project Logo"
+            className=""
+          ></Image>
         </SidebarHeader>
-        <SidebarContent>
-          <NavMain items={data.navMain} />
-          <NavProjects projects={data.projects} />
-          <NavSettings projects={data.settings} />
+        <SidebarContent className="mt-[30px]">
+          <ScrollArea className="">
+            <NavMain items={data.navMain} />
+            <NavProjects items={data.projects} />
+            <NavSettings projects={data.settings} />
+            <NavTest items={data.testing} />
+          </ScrollArea>
         </SidebarContent>
-        <SidebarFooter>
+        <SidebarFooter className="">
           <NavUser user={data.user} />
         </SidebarFooter>
         <SidebarRail />
@@ -226,15 +225,13 @@ export function AppSidebar({
           <div className="flex items-center w-full gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
             <SidebarSeparator orientation="vertical" className="mr-2 h-4" />
-           
+
             <div className="flex items-center gap-2 flex-1">
-
-            <Breadcrumbs />
-            {/* <DropdownMenu>
+              <Breadcrumbs />
+              {/* <DropdownMenu>
               <DropdownMenuTrigger asChild> */}
-              
 
-                {/* <Button onClick={() => setTheme(theme === "light" ? "dark" : "light")} className="ml-auto rounded-full" variant="outline" size="icon">
+              {/* <Button onClick={() => setTheme(theme === "light" ? "dark" : "light")} className="ml-auto rounded-full" variant="outline" size="icon">
                   <motion.div
                     initial={{ rotate: theme === "light" ? 0 : 90, scale: theme === "light" ? 1 : 0 }}
                     animate={{ rotate: theme === "light" ? 0 : 90, scale: theme === "light" ? 1 : 0 }}
@@ -279,5 +276,5 @@ export function AppSidebar({
         {children}
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }

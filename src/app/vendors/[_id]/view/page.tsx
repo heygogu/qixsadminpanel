@@ -15,7 +15,7 @@ import {
 import PageContainer from "@/components/layouts/page-container";
 import DashboardLayout from "@/components/layouts/dashboard-layout";
 import { useParams } from "next/navigation";
-import henceforthApi from "@/app/utils/henceforthApis";
+import henceforthApi from "@/utils/henceforthApis";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // Updated VendorDetailsSkeleton component
