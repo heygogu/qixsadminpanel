@@ -170,7 +170,7 @@ function AddTemplate() {
       toast.success("Agent created successfully");
     } catch (error) {
     } finally {
-      router.push("/aiagents/page/1");
+      router.push("/ai-agents/page/1");
     }
   }
 

@@ -105,7 +105,7 @@ const WhiteLabelSubmissions = () => {
 
   useEffect(() => {
     getListingData();
-  }, []);
+  }, [searchParams.get("search"), params?.pagination]);
   const getStatusBadge = (status) => {
     const variants = {
       new: "bg-green-100 text-green-800",
@@ -135,7 +135,10 @@ const WhiteLabelSubmissions = () => {
     },
     {
       header: "Phone",
-      accessorKey: "phone",
+      accessorKey: "phone_no",
+      cell: ({ row }) => (
+        <span>{row.original.country_code + row.original.phone_no}</span>
+      ),
     },
     {
       header: "Message",

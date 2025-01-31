@@ -152,7 +152,7 @@ function AgentsPage() {
       cell: ({ row }: { row: any }) => {
         return (
           <Link
-            href={`/aiagents/${row.original?._id}/view?callPage=1&chatPage=1&voiceChatPage=1`}
+            href={`/ai-agents/${row.original?._id}/view?callPage=1&chatPage=1&voiceChatPage=1`}
           >
             <EyeIcon className="mr-2 text-gray-600 h-4 w-4 " />
           </Link>
@@ -187,7 +187,7 @@ function AgentsPage() {
 
   const handlePageChange = (page: number) => {
     const query = new URLSearchParams(searchParams?.toString());
-    router.replace(`/aiagents/page/${page}?${query.toString()}`, {
+    router.replace(`/ai-agents/page/${page}?${query.toString()}`, {
       scroll: false,
     });
   };

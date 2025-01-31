@@ -217,7 +217,7 @@ function EditAgentTemplate() {
       toast.success("Agent updated successfully");
       // router.push("/aiagents/page/1");
 
-      const path = "/aiagents/page/1";
+      const path = "/ai-agents/page/1";
 
       const link = document.createElement("a");
       link.href = path;
@@ -689,7 +689,7 @@ function EditAgentTemplate() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => router.push("/aiagents/page/1")}
+              onClick={() => router.push("/ai-agents/page/1")}
             >
               Cancel
             </Button>

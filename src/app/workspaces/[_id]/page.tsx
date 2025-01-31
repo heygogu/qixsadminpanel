@@ -23,6 +23,34 @@ import dayjs from "dayjs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { workerData } from "worker_threads";
 // Column definitions for subscriptions
+
+const WorkspaceDetailsSkeleton = () => (
+  <Card>
+    <CardContent className="pt-4">
+      <div className="grid md:grid-cols-2 gap-4 p-3">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-16 w-16 rounded-full" />
+            <div>
+              <Skeleton className="h-6 w-32 mb-2" />
+              <Skeleton className="h-4 w-24" />
+            </div>
+          </div>
+        </div>
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-6 w-16" />
+            <Skeleton className="h-4 w-24" />
+          </div>
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-4 w-4" />
+            <Skeleton className="h-4 w-20" />
+          </div>
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+);
 const subscriptionColumns = [
   {
     accessorKey: "srNo",
@@ -104,6 +132,21 @@ const memberColumns = [
   },
 ];
 
+interface IWorkspaceDetails {
+  _id: string;
+  name: string;
+  image: string;
+  status: string;
+  created_at: number;
+  updated_at: number;
+  owner_data: {
+    _id: string;
+    name: string;
+    profile_pic: string | null;
+  };
+  workspace_members_count: number;
+  subscription_data: any[];
+}
 const WorkspaceModule = () => {
   const [workSpaceMembers, setWorkspaceMembers] = useState({
     data: [],
@@ -116,14 +159,28 @@ const WorkspaceModule = () => {
     count: 0,
     loading: false,
   });
-
-  const [workspaceDetails, setWorkSpaceDetails] = useState<any>();
+  const [workspaceDetails, setWorkSpaceDetails] = useState<IWorkspaceDetails>({
+    _id: "",
+    name: "",
+    image: "",
+    status: "",
+    created_at: 0,
+    updated_at: 0,
+    owner_data: {
+      _id: "",
+      name: "",
+      profile_pic: "",
+    },
+    workspace_members_count: 0,
+    subscription_data: [],
+  });
+  const [loading, setLoading] = useState(false);
 
   const searchParams = useSearchParams();
   const params = useParams();
 
   const fetchWorkspaceMembers = async () => {
-    setWorkSpaceDetails({
+    setWorkspaceMembers({
       ...workSpaceMembers,
       loading: true,
     });
@@ -147,7 +204,7 @@ const WorkspaceModule = () => {
       });
     } catch (error) {
     } finally {
-      setWorkSpaceDetails({
+      setWorkspaceMembers({
         ...workSpaceMembers,
         loading: false,
       });
@@ -183,14 +240,21 @@ const WorkspaceModule = () => {
   };
 
   const getWorkSpaceDetails = async () => {
+    setLoading(true);
     try {
       const apiRes = await henceforthApi.SuperAdmin.workspaceDetails(
         String(params?._id)
       );
       setWorkSpaceDetails(apiRes?.data);
-    } catch (error) {}
+    } catch (error) {
+    } finally {
+      setLoading(false);
+    }
   };
 
+  useEffect(() => {
+    getWorkSpaceDetails();
+  }, []);
   useEffect(() => {
     fetchWorkspaceMembers();
   }, [searchParams.get("memberPage")]);
@@ -198,10 +262,6 @@ const WorkspaceModule = () => {
   useEffect(() => {
     fetchSubscriptionData();
   }, [searchParams.get("subscriptionPage")]);
-
-  useEffect(() => {
-    getWorkSpaceDetails();
-  }, []);
 
   const memberSkeletonColumns = memberColumns.map((column: any) => ({
     ...column,
@@ -225,52 +285,56 @@ const WorkspaceModule = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-8">
-            <Card>
-              <CardContent className="pt-4">
-                <div className="grid md:grid-cols-2 gap-4  p-3 ">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Avatar className="h-16 w-16 border-2 border-white shadow-md">
-                        <AvatarImage
-                          src={henceforthApi.FILES.imageOriginal(
-                            workspaceDetails?.image
-                          )}
-                          alt="Workspace"
-                        />
-                        <AvatarFallback>
-                          <Building2 className="h-8 w-8" />
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <h3 className="text-lg font-semibold">
-                          {workspaceDetails?.name}
-                        </h3>
-                        <p className="text-sm text-gray-500">
-                          {dayjs(workspaceDetails?.created_at).format(
-                            "DD MMM YYYY"
-                          )}
-                        </p>
+            {loading ? (
+              <WorkspaceDetailsSkeleton />
+            ) : (
+              <Card>
+                <CardContent className="pt-4">
+                  <div className="grid md:grid-cols-2 gap-4  p-3 ">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Avatar className="h-16 w-16 border-2 border-white shadow-md">
+                          <AvatarImage
+                            src={henceforthApi.FILES.imageOriginal(
+                              workspaceDetails?.image
+                            )}
+                            alt="Workspace"
+                          />
+                          <AvatarFallback>
+                            <Building2 className="h-8 w-8" />
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <h3 className="text-lg font-semibold">
+                            {workspaceDetails?.name}
+                          </h3>
+                          <p className="text-sm text-gray-500">
+                            {dayjs(workspaceDetails?.created_at).format(
+                              "DD MMM YYYY"
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline">Active</Badge>
+                        <span className="text-sm text-gray-500">
+                          {workspaceDetails?.workspace_members_count}{" "}
+                          {workspaceDetails?.workspace_members_count < 2
+                            ? "member"
+                            : "members"}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CreditCard className="h-4 w-4 text-gray-500" />
+                        <span>$299/month</span>
                       </div>
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline">Active</Badge>
-                      <span className="text-sm text-gray-500">
-                        {workspaceDetails?.workspace_members_count}{" "}
-                        {workspaceDetails?.workspace_members_count < 2
-                          ? "member"
-                          : "members"}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CreditCard className="h-4 w-4 text-gray-500" />
-                      <span>$299/month</span>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
 
             <Card>
               <CardHeader>

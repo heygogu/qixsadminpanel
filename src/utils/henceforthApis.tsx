@@ -127,6 +127,13 @@ const SuperAdmin = {
   //whitelist data
   whiteLabelListing: (q?: any) =>
     requests.get(`admin/white-label${q ? `?${q}` : ""}`),
+
+  //ticket listing
+  getTickets: (q?: any) => requests.get(`admin/contactus${q ? `?${q}` : ""}`),
+  getTicketDetails: (id: string) => requests.get(`admin/contactus/${id}`),
+  updateTicketStatus: (id: string, info: any) =>
+    requests.put(`admin/contactus/${id}`, info),
+  deleteTicket: (id: string) => requests.deleteOne(`admin/contactus/${id}`),
 };
 
 const Auth = {
