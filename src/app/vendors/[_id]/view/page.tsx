@@ -190,8 +190,11 @@ const WorkspaceCard = ({
           <Avatar className="h-16 w-16 shadow-md border-2 border-white">
             <AvatarImage
               className="object-cover"
-              src={workspace.image}
-              alt={workspace.name}
+              src={henceforthApi.FILES?.imageOriginal(
+                workspace?.image ?? "",
+                ""
+              )}
+              alt={workspace?.name}
             />
             <AvatarFallback>
               <ImageIcon className="h-8 w-8" />
@@ -203,13 +206,13 @@ const WorkspaceCard = ({
               <Badge
                 variant="default"
                 className={`shadow-md ${
-                  workspace.status === "UNBLOCK" && "bg-green-500"
+                  workspace?.status === "UNBLOCK" && "bg-green-500"
                 }`}
               >
                 {workspace.status === "UNBLOCK" ? "Active" : "Blocked"}
               </Badge>
               <span className="text-sm text-gray-500">
-                {workspace.member_counts} members
+                {workspace?.member_counts} members
               </span>
             </div>
           </div>
@@ -221,7 +224,7 @@ const WorkspaceCard = ({
               <AvatarImage
                 className="object-cover"
                 src={henceforthApi.FILES?.imageOriginal(
-                  workspace.owner?.profile_pic ?? "",
+                  workspace?.owner?.profile_pic ?? "",
                   ""
                 )}
                 alt="Owner image"
@@ -231,11 +234,11 @@ const WorkspaceCard = ({
               </AvatarFallback>
             </Avatar>
             <div>
-              <p className="text-sm font-medium">{workspace.owner?.name}</p>
+              <p className="text-sm font-medium">{workspace?.owner?.name}</p>
               <p className="text-sm text-gray-500">
                 {type === "owned"
                   ? "Owner"
-                  : `Shared by ${workspace.owner?.name}`}
+                  : `Shared by ${workspace?.owner?.name}`}
               </p>
             </div>
           </div>
@@ -248,10 +251,10 @@ const WorkspaceCard = ({
             </div>
             <Badge
               variant={
-                workspace.subscriptions.is_active ? "default" : "secondary"
+                workspace?.subscriptions?.is_active ? "default" : "secondary"
               }
             >
-              {workspace.subscriptions.is_active
+              {workspace?.subscriptions?.is_active
                 ? "Active Sub"
                 : "Inactive Sub"}
             </Badge>
@@ -280,7 +283,7 @@ const WorkspacesSection = ({
         {title} ({workspaces.length})
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {workspaces.map((workspace) => (
+        {workspaces?.map((workspace) => (
           <WorkspaceCard
             key={workspace._id}
             workspace={workspace}
@@ -385,12 +388,12 @@ const VendorDetails = () => {
               <div className="space-y-12">
                 <WorkspacesSection
                   title="Owned Workspaces"
-                  workspaces={vendorDetails.workspace_info.owner}
+                  workspaces={vendorDetails?.workspace_info?.owner}
                   type="owned"
                 />
                 <WorkspacesSection
                   title="Shared Workspaces"
-                  workspaces={vendorDetails.workspace_info.shared}
+                  workspaces={vendorDetails?.workspace_info?.shared}
                   type="shared"
                 />
               </div>

@@ -7,7 +7,16 @@ import PageContainer from "@/components/layouts/page-container";
 import henceforthApi from "@/utils/henceforthApis";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Bot, EyeIcon, Info, Plus, User, UserPlus } from "lucide-react";
+import {
+  Bot,
+  EyeIcon,
+  Info,
+  PencilIcon,
+  Plus,
+  Trash2,
+  User,
+  UserPlus,
+} from "lucide-react";
 import { DataTable } from "@/components/common/data-table";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -71,6 +80,16 @@ function AgentsPage() {
       console.error("Failed to fetch agents listing:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await henceforthApi.SuperAdmin.deleteAgentTemplate(id);
+      Toast.success("Agent deleted successfully");
+      getAgentsListing();
+    } catch (error) {
+      Toast.error("Failed to delete agent");
     }
   };
 
@@ -151,11 +170,22 @@ function AgentsPage() {
       id: "actions",
       cell: ({ row }: { row: any }) => {
         return (
-          <Link
-            href={`/ai-agents/${row.original?._id}/view?callPage=1&chatPage=1&voiceChatPage=1`}
-          >
-            <EyeIcon className="mr-2 text-gray-600 h-4 w-4 " />
-          </Link>
+          <div className="space-x-2">
+            <Link
+              href={`/ai-agents/edit/agent-template/${row.original?._id}`}
+              passHref
+            >
+              <Button variant="outline">
+                <PencilIcon className=" text-gray-600 h-5 w-5 " />
+              </Button>
+            </Link>
+            <Button
+              variant={"outline"}
+              onClick={() => handleDelete(row.original?._id)}
+            >
+              <Trash2 className="text-gray-600 h-5 w-5" />
+            </Button>
+          </div>
         );
         // const agent = row.original;
         // return (

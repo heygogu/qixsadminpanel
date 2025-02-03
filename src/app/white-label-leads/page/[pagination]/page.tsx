@@ -34,6 +34,11 @@ import { set } from "react-hook-form";
 import { useGlobalContext } from "@/app/providers/Provider";
 import { Skeleton } from "@/components/ui/skeleton";
 import PaginationCompo from "@/components/common/Pagination";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const WhiteLabelSubmissions = () => {
   const [listing, setListing] = useState({
@@ -143,6 +148,20 @@ const WhiteLabelSubmissions = () => {
     {
       header: "Message",
       accessorKey: "message",
+      cell: ({ row }) => (
+        <Tooltip>
+          <TooltipTrigger>
+            <span>
+              {row.original.message.length > 30
+                ? row.original.message.slice(0, 30) + "..."
+                : row.original.message}
+            </span>
+          </TooltipTrigger>
+          <TooltipContent className="max-w-[300px] whitespace-normal break-words">
+            {row.original.message}
+          </TooltipContent>
+        </Tooltip>
+      ),
     },
     {
       header: "Status",

@@ -5,23 +5,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/common/data-table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Building2,
-  Users,
-  CreditCard,
-  Lock,
-  Eye,
-  Image as ImageIcon,
-  User,
-} from "lucide-react";
+
+import { Building2, Users, CreditCard, Lock, Eye, User } from "lucide-react";
 import PageContainer from "@/components/layouts/page-container";
 import DashboardLayout from "@/components/layouts/dashboard-layout";
 import henceforthApi from "@/utils/henceforthApis";
 import { useParams, useSearchParams } from "next/navigation";
 import dayjs from "dayjs";
 import { Skeleton } from "@/components/ui/skeleton";
-import { workerData } from "worker_threads";
+import Link from "next/link";
+
 // Column definitions for subscriptions
 
 const WorkspaceDetailsSkeleton = () => (
@@ -51,86 +44,6 @@ const WorkspaceDetailsSkeleton = () => (
     </CardContent>
   </Card>
 );
-const subscriptionColumns = [
-  {
-    accessorKey: "srNo",
-    header: "Sr No",
-  },
-  {
-    accessorKey: "name",
-    header: "Subscription Name",
-  },
-  {
-    accessorKey: "amount",
-    header: "Amount",
-    cell: ({ row }) => `$${row.original.amount}`,
-  },
-  {
-    accessorKey: "date",
-    header: "Date",
-  },
-];
-
-// Column definitions for members
-const memberColumns = [
-  {
-    accessorKey: "name",
-    header: "User",
-    cell: ({ row }) => (
-      <div className="flex items-center gap-2">
-        <Avatar className="h-10 w-10 shadow-md border-2 border-white">
-          <AvatarImage
-            className="object-cover"
-            src={henceforthApi.FILES.imageOriginal(
-              row.original?.vendor_id?.profile_pic
-            )}
-            alt={row.original?.vendor_id?.name}
-          />
-          <AvatarFallback>
-            <User className="h-4 w-4" />
-          </AvatarFallback>
-        </Avatar>
-        <div className="flex flex-col">
-          <span className="font-medium">{row.original?.vendor_id?.name}</span>
-          <span className="text-gray-500">{row?.original?.email}</span>
-        </div>
-      </div>
-    ),
-  },
-  {
-    accessorKey: "role",
-    header: "Role",
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => (
-      <Badge
-        variant={row.original.status === "ACTIVE" ? "default" : "destructive"}
-        className={`shadow-md ${
-          row.original.status === "ACTIVE"
-            ? "bg-green-100 text-green-800"
-            : "bg-yellow-100 text-yellow-800"
-        }`}
-      >
-        {row.original.status === "ACTIVE"
-          ? "Active"
-          : row.original.status === "IN_ACTIVE"
-          ? "Inactive"
-          : "Unknown"}
-      </Badge>
-    ),
-  },
-  {
-    id: "actions",
-    header: "Actions",
-    cell: () => (
-      <Button variant="ghost" size="icon">
-        <Eye className="h-4 w-4" />
-      </Button>
-    ),
-  },
-];
 
 interface IWorkspaceDetails {
   _id: string;
@@ -159,6 +72,7 @@ const WorkspaceModule = () => {
     count: 0,
     loading: false,
   });
+  console.log(subscriptionData, "subscriptionData");
   const [workspaceDetails, setWorkSpaceDetails] = useState<IWorkspaceDetails>({
     _id: "",
     name: "",
@@ -179,11 +93,111 @@ const WorkspaceModule = () => {
   const searchParams = useSearchParams();
   const params = useParams();
 
+  //columns
+  const subscriptionColumns = [
+    {
+      accessorKey: "srNo",
+      header: "Sr No",
+      cell: ({ row }) => {
+        const currentPage = Number(searchParams.get("subscriptionPage") || 1);
+        const index = (currentPage - 1) * 10 + row.index + 1;
+        return index;
+      },
+    },
+    {
+      accessorKey: "plan_name",
+      header: "Subscription Name",
+    },
+    {
+      accessorKey: "amount",
+      header: "Amount",
+      cell: ({ row }) => `$${row.original.amount}`,
+    },
+    {
+      accessorKey: "created_on",
+      header: "Date",
+      cell: ({ row }) => dayjs(row.original.created_on).format("DD MMM YYYY"),
+    },
+  ];
+
+  // Column definitions for members
+  const memberColumns = [
+    {
+      accessorKey: "srNo",
+      header: "Sr No",
+      cell: ({ row }) => {
+        const currentPage = Number(searchParams.get("memberPage") || 1);
+        const index = (currentPage - 1) * 10 + row.index + 1;
+        return index;
+      },
+    },
+    {
+      // accessorKey: "name",
+      header: "User",
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          <Avatar className="h-10 w-10 shadow-md border-2 border-white">
+            <AvatarImage
+              className="object-cover"
+              src={henceforthApi.FILES.imageOriginal(
+                row.original?.vendor_id?.profile_pic,
+                ""
+              )}
+              alt={row.original?.vendor_id?.name}
+            />
+            <AvatarFallback>
+              <User className="h-4 w-4" />
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col">
+            <span className="font-medium">{row.original?.vendor_id?.name}</span>
+            <span className="text-gray-500">{row?.original?.email}</span>
+          </div>
+        </div>
+      ),
+    },
+    {
+      accessorKey: "role",
+      header: "Role",
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => (
+        <Badge
+          variant={row.original.status === "ACTIVE" ? "default" : "destructive"}
+          className={`shadow-md ${
+            row.original.status === "ACTIVE"
+              ? "bg-green-100 text-green-800"
+              : "bg-yellow-100 text-yellow-800"
+          }`}
+        >
+          {row.original.status === "ACTIVE"
+            ? "Active"
+            : row.original.status === "IN_ACTIVE"
+            ? "Inactive"
+            : "Unknown"}
+        </Badge>
+      ),
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => (
+        <Link href={`/vendors/${row.original.vendor_id._id}/view`} passHref>
+          <Button variant="ghost" size="icon">
+            <Eye className="h-4 w-4" />
+          </Button>
+        </Link>
+      ),
+    },
+  ];
+
   const fetchWorkspaceMembers = async () => {
-    setWorkspaceMembers({
-      ...workSpaceMembers,
+    setWorkspaceMembers((prev) => ({
+      ...prev,
       loading: true,
-    });
+    }));
     try {
       let urlSearchParams = new URLSearchParams();
       if (searchParams.get("memberPage")) {
@@ -197,25 +211,25 @@ const WorkspaceModule = () => {
         String(params?._id),
         urlSearchParams.toString()
       );
-      setWorkspaceMembers({
-        ...workSpaceMembers,
+      setWorkspaceMembers((prev) => ({
+        ...prev,
         data: apiRes?.data?.data,
         count: apiRes?.data?.count,
-      });
+      }));
     } catch (error) {
     } finally {
-      setWorkspaceMembers({
-        ...workSpaceMembers,
+      setWorkspaceMembers((prev) => ({
+        ...prev,
         loading: false,
-      });
+      }));
     }
   };
 
   const fetchSubscriptionData = async () => {
-    setSubscriptionData({
-      ...subscriptionData,
+    setSubscriptionData((prev) => ({
+      ...prev,
       loading: true,
-    });
+    }));
     try {
       let urlSearchParams = new URLSearchParams();
       if (searchParams.get("subscriptionPage")) {
@@ -230,12 +244,18 @@ const WorkspaceModule = () => {
           String(params?._id),
           urlSearchParams.toString()
         );
+      console.log(apiRes, "subscriptionapiRes");
+      setSubscriptionData((prev) => ({
+        ...prev,
+        data: apiRes?.data?.data,
+        count: apiRes?.data?.count,
+      }));
     } catch (error) {
     } finally {
-      setSubscriptionData({
-        ...subscriptionData,
+      setSubscriptionData((prev) => ({
+        ...prev,
         loading: false,
-      });
+      }));
     }
   };
 

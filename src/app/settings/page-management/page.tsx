@@ -1,6 +1,6 @@
 // app/page-management/page.tsx
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -22,6 +22,8 @@ import Link from "next/link";
 import DashboardLayout from "@/components/layouts/dashboard-layout";
 import PageContainer from "@/components/layouts/page-container";
 import { DataTable } from "@/components/common/data-table";
+import henceforthApi from "@/utils/henceforthApis";
+import dayjs from "dayjs";
 
 interface Page {
   id: number;
@@ -29,56 +31,70 @@ interface Page {
   updatedAt: string;
 }
 
-const pages: Page[] = [
-  { id: 1, title: "Privacy Policy", updatedAt: "21 Jun 2024" },
-  { id: 2, title: "Terms & Conditions", updatedAt: "21 Jun 2024" },
-  { id: 3, title: "About Us", updatedAt: "21 Jun 2024" },
-];
-
-const columns = [
-  {
-    header: "Sr. no.",
-    accessorKey: "id",
-  },
-  {
-    header: "Title",
-    accessorKey: "title",
-  },
-  {
-    header: "Updated at",
-    accessorKey: "updatedAt",
-  },
-  {
-    header: "Action",
-    accessorKey: "id",
-    cell: ({ row }) => (
-      <div className="flex items-center gap-2">
-        <Link
-          href={`/settings/page-management/view/${row
-            .getValue("title")
-            .toLowerCase()
-            .replace(/ /g, "-")}`}
-        >
-          <Button variant="outline" size="sm">
-            <Eye className="h-4 w-4" />
-          </Button>
-        </Link>
-        <Link
-          href={`/settings/page-management/edit/${row
-            .getValue("title")
-            .toLowerCase()
-            .replace(/ /g, "-")}`}
-        >
-          <Button variant="outline" size="sm">
-            <PenSquare className="h-4 w-4" />
-          </Button>
-        </Link>
-      </div>
-    ),
-  },
-];
-
 const PageManagement = () => {
+  const [contentListing, setContentListing] = React.useState({
+    data: [],
+  });
+
+  const getContentPages = async () => {
+    try {
+      const apiRes = await henceforthApi.SuperAdmin.contentPageListing();
+      setContentListing({ data: apiRes?.data });
+    } catch (error) {}
+  };
+  useEffect(() => {
+    getContentPages();
+  }, []);
+  const columns = [
+    {
+      header: "Sr. no.",
+      cell: ({ row }) => {
+        return <span>{row.index + 1}</span>;
+      },
+    },
+    {
+      header: "Title",
+      accessorKey: "page_type",
+      cell: ({ row }) => {
+        return (
+          <span>
+            {row.original?.page_type
+              ?.split("_")
+              ?.map(
+                (word) =>
+                  word?.charAt(0)?.toUpperCase() + word?.slice(1)?.toLowerCase()
+              )
+              .join(" ")}
+          </span>
+        );
+      },
+    },
+    {
+      header: "Updated at",
+      accessorKey: "created_at",
+      cell: ({ row }) => (
+        <span>{dayjs(row.original.created_at).format("DD MMM YYYY")}</span>
+      ),
+    },
+    {
+      header: "Action",
+      accessorKey: "id",
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          <Link href={`/settings/page-management/view/${row?.original?._id}`}>
+            <Button variant="outline" size="sm">
+              <Eye className="h-4 w-4" />
+            </Button>
+          </Link>
+          <Link href={`/settings/page-management/edit/${row?.original?._id}`}>
+            <Button variant="outline" size="sm">
+              <PenSquare className="h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
+      ),
+    },
+  ];
   return (
     <PageContainer>
       <Card>
@@ -93,7 +109,11 @@ const PageManagement = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <DataTable columns={columns} data={pages} totalItems={pages.length} />
+          <DataTable
+            columns={columns}
+            data={contentListing?.data}
+            totalItems={10}
+          />
         </CardContent>
       </Card>
     </PageContainer>

@@ -32,6 +32,7 @@ import { useGlobalContext } from "@/app/providers/Provider";
 import henceforthApi from "@/utils/henceforthApis";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { destroyCookie } from "nookies";
 
 export function NavUser({
   user,
@@ -65,7 +66,7 @@ export function NavUser({
                   alt={userInfo?.name}
                 />
                 <AvatarFallback className="rounded-full bg-secondary">
-                  SA
+                  <User className="w-5 h-5" />
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
@@ -96,7 +97,7 @@ export function NavUser({
                     alt={userInfo?.name}
                   />
                   <AvatarFallback className="rounded-circle bg-secondary">
-                    SA
+                    <User className="w-5 h-5" />
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
@@ -134,7 +135,15 @@ export function NavUser({
               </DropdownMenuItem> */}
             </DropdownMenuGroup>
             {/* {/* <DropdownMenuSeparator /> */}
-            <DropdownMenuItem className="text-red-500">
+            <DropdownMenuItem
+              onClick={async () => {
+                router.push("/login");
+                destroyCookie(null, "COOKIES_ADMIN_ACCESS_TOKEN", {
+                  path: "/",
+                });
+              }}
+              className="text-red-500"
+            >
               <LogOut />
               Log out
             </DropdownMenuItem>

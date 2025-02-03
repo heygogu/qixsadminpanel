@@ -11,6 +11,8 @@ import PageContainer from "@/components/layouts/page-container";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import "react-quill/dist/quill.snow.css";
+import henceforthApi from "@/utils/henceforthApis";
+import { get } from "http";
 
 const ReactQuill = dynamic(() => import("react-quill"), {
   ssr: false,
@@ -72,9 +74,33 @@ const getPageContent = (slug: string) => {
 export default function EditPage({ params }: { params: { slug: string } }) {
   const [content, setContent] = useState("");
   const [saving, setSaving] = useState(false);
+  const [pageSlug, setPageSlug] = useState("");
+  const getPageContent = async () => {
+    let realSlug = "";
+    if (params.slug === "privacy-policy") {
+      realSlug = "PRIVACY_POLICY";
+    } else if (params.slug === "terms-&-conditions") {
+      realSlug = "TERM_AND_CONDITIONS";
+    } else if (params.slug === "about-us") {
+      realSlug = "ABOUT_US";
+    }
+    try {
+      if (!realSlug) {
+        console.error("Invalid page slug");
+        return;
+      }
+      setPageSlug(realSlug);
+      const apiRes = await henceforthApi.SuperAdmin.getPageContent(realSlug);
+      if (apiRes?.data?.[0]) {
+        setContent(apiRes.data[0]);
+      }
+    } catch (error) {
+      console.error("Error fetching page content:", error);
+    }
+  };
 
   useEffect(() => {
-    setContent(getPageContent(params.slug));
+    getPageContent();
   }, [params.slug]);
 
   const title = decodeURIComponent(params.slug)
@@ -85,8 +111,28 @@ export default function EditPage({ params }: { params: { slug: string } }) {
   const handleSave = async () => {
     setSaving(true);
     // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setSaving(false);
+
+    //   "_id": "string",
+    // "image_url": "content.png",
+    // "title": "Title...",
+    // "page_type": "ABOUT_US",
+    // "description": "content description",
+    // "page_url": "www.google.com"
+    const info = {
+      image_url: "content.png",
+      title: title,
+      page_type: pageSlug,
+      description: content,
+      page_url: "www.google.com",
+    };
+    try {
+      const apiRes = await henceforthApi.SuperAdmin.updatePageContent(info);
+      console.log(apiRes);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
