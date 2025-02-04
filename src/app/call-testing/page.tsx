@@ -66,7 +66,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { get } from "http";
+
 import { useGlobalContext } from "@/app/providers/Provider";
 import { MultiSelect } from "@/components/common/MultiSelect";
 
@@ -100,7 +100,7 @@ const PhoneNumberSubmission = () => {
     },
   });
   const [knowledgeBaseOptions, setKnowledgeBaseOptions] = useState<any>([]);
-  const { userInfo } = useGlobalContext();
+  const { userInfo, Toast } = useGlobalContext();
   const knowledgeBasesforSelection = knowledgeBaseOptions?.map(
     (option: any) => ({
       value: option?._id,
@@ -108,7 +108,8 @@ const PhoneNumberSubmission = () => {
       icon: LibraryBig,
     })
   );
-  const { Toast } = useGlobalContext();
+  const [defaultKnowledgeBase, setDefaultKnowledgeBase] = useState<any>([]);
+
   const [secretKey, setSecretKey] = useState<string | null>(null);
   const getKeyListing = async () => {
     // setIsLoading(true)
@@ -137,18 +138,17 @@ const PhoneNumberSubmission = () => {
     getKnowledgeBaseOptions();
   }, []);
 
+  const [kbLoading, setKbLoading] = useState(true);
+
   useEffect(() => {
     const getFormData = async () => {
       try {
         const apiRes = await henceforthApi.SuperAdmin.defaultCallData();
         console.log(apiRes, "apiRes?.data");
 
-        // form.setValue("knowledgeBase",apiRes?.knowledge_base_id);
-        // console.log("voice",String(apiRes?.voice));
-        // form.setValue("voice",apiRes?.voice);
-        // form.setValue("systemPrompt", apiRes?.call_prompt);
-        // form.setValue("firstMessage", apiRes?.call_first_message);
-        // form.setValue("ai_model", apiRes?.ai_model);
+        await setDefaultKnowledgeBase(
+          apiRes?.knowledge_base_id?.map((option: any) => option)
+        );
         form.reset({
           ...form.getValues(),
           voice: apiRes?.voice,
@@ -156,6 +156,7 @@ const PhoneNumberSubmission = () => {
           firstMessage: apiRes?.call_first_message || "",
           ai_model: apiRes?.ai_model || "gemini",
         });
+        setKbLoading(false);
       } catch (error) {}
     };
     getFormData();
@@ -163,10 +164,14 @@ const PhoneNumberSubmission = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       // Your API submission logic here
+
+      if (defaultKnowledgeBase?.length === 0) {
+        return Toast.error("Please select a knowledge base");
+      }
       console.log(values);
       const payload = {
         phone_no: `${values.countryCode + values.phoneNumber}`,
-        knowledge_base_id: values.knowledgeBase,
+        knowledge_base_id: defaultKnowledgeBase,
         secret_key: secretKey,
         voice: values.voice,
         prompt: values.systemPrompt,
@@ -340,29 +345,34 @@ const PhoneNumberSubmission = () => {
                       </div>
 
                       {/* Knowledge Base */}
-                      <FormField
-                        control={form.control}
-                        name="knowledgeBase"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="flex items-center gap-2">
-                              <LibraryBig className="h-4 w-4" />
-                              Knowledge Base
-                            </FormLabel>
+                      {!kbLoading ? (
+                        <FormField
+                          name="knowledgeBase"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="flex items-center gap-2">
+                                <LibraryBig className="h-4 w-4" />
+                                Knowledge Base
+                              </FormLabel>
 
-                            <MultiSelect
-                              options={knowledgeBasesforSelection}
-                              onValueChange={field.onChange}
-                              defaultValue={field.value || []}
-                              placeholder="Select Knowledge Bases"
-                              variant="inverted"
-                              animation={2}
-                              maxCount={8}
-                            />
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                              <MultiSelect
+                                options={knowledgeBasesforSelection}
+                                onValueChange={setDefaultKnowledgeBase}
+                                defaultValue={defaultKnowledgeBase}
+                                placeholder="Select Knowledge Bases"
+                                variant="inverted"
+                                animation={2}
+                                maxCount={8}
+                              />
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      ) : (
+                        <span className="text-sm font-semibold">
+                          Loading Knowledge Bases...
+                        </span>
+                      )}
                       {/*AI Model*/}
                       <FormField
                         control={form.control}

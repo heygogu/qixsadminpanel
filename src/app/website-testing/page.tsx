@@ -1,5 +1,5 @@
 "use client";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {
@@ -72,7 +72,7 @@ const formSchema = z.object({
   call_prompt: z.string().min(1, "Please enter call prompt"),
   call_first_message: z.string().min(1, "Please enter call first message"),
   ai_model: z.string().min(1, "Please select an AI model"),
-  knowledgeBaseForWebsite: z.array(z.string()),
+  knowledgeBaseForWebsite: z.array(z.string()).optional(),
 });
 
 const PhoneNumberSubmission = () => {
@@ -81,10 +81,10 @@ const PhoneNumberSubmission = () => {
     defaultValues: {
       //   knowledgeBase: [],
       // voice: "aura-zeus-en",
-
-      knowledgeBaseForWebsite: [],
+      // knowledgeBaseForWebsite: [],
     },
   });
+
   const [knowledgeBaseOptions, setKnowledgeBaseOptions] = useState<any>([]);
   const knowledgeBasesforSelection = knowledgeBaseOptions?.map(
     (option: any) => ({
@@ -93,6 +93,7 @@ const PhoneNumberSubmission = () => {
       icon: LibraryBig,
     })
   );
+  const [defaultKnowledgeBase, setDefaultKnowledgeBase] = useState<any>([]);
   const { Toast } = useGlobalContext();
 
   useEffect(() => {
@@ -105,13 +106,17 @@ const PhoneNumberSubmission = () => {
     };
     getKnowledgeBaseOptions();
   }, []);
-
+  const [kbLoading, setKbLoading] = useState(true);
   useEffect(() => {
     const getFormData = async () => {
       try {
         const apiRes = await henceforthApi.SuperAdmin.websiteTestingListing();
         console.log(apiRes?.data, "apiRes?.data");
-
+        await setDefaultKnowledgeBase(
+          apiRes?.data?.knowledge_base_id_for_website?.map(
+            (option: any) => option?._id
+          )
+        );
         form.reset({
           voice: apiRes?.data?.voice,
           chat_first_message: apiRes?.data?.chat_first_message,
@@ -119,8 +124,8 @@ const PhoneNumberSubmission = () => {
           call_prompt: apiRes?.data?.call_prompt,
           call_first_message: apiRes?.data?.call_first_message,
           ai_model: apiRes?.data?.ai_model,
-          knowledgeBaseForWebsite: apiRes?.data?.knowledgeBaseForWebsite || [],
         });
+        setKbLoading(false);
       } catch (error) {}
     };
     getFormData();
@@ -128,12 +133,15 @@ const PhoneNumberSubmission = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       // Your API submission logic here
+      if (defaultKnowledgeBase?.length === 0) {
+        return Toast.error("Please select a knowledge base");
+      }
       debugger;
       console.log(values);
       const payload = {
         // phone_no: `${values.countryCode + values.phoneNumber}`,
-        // knowledge_base_id: values.knowledgeBase,
-        knowledge_base_id_for_website: values.knowledgeBaseForWebsite,
+        knowledge_base_id: defaultKnowledgeBase,
+        knowledge_base_id_for_website: defaultKnowledgeBase,
         voice: values.voice,
         chat_first_message: values.chat_first_message,
         chat_prompt: values.chat_prompt,
@@ -179,29 +187,34 @@ const PhoneNumberSubmission = () => {
                     onSubmit={form.handleSubmit(onSubmit)}
                     className="space-y-6"
                   >
-                    <FormField
-                      control={form.control}
-                      name="knowledgeBaseForWebsite"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="flex items-center gap-2">
-                            <LibraryBig className="h-4 w-4" />
-                            Knowledge Base (Website)
-                          </FormLabel>
+                    {!kbLoading ? (
+                      <FormField
+                        name="knowledgeBaseForWebsite"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="flex items-center gap-2">
+                              <LibraryBig className="h-4 w-4" />
+                              Knowledge Base (Website)
+                            </FormLabel>
 
-                          <MultiSelect
-                            options={knowledgeBasesforSelection}
-                            onValueChange={field.onChange}
-                            defaultValue={field.value || []}
-                            placeholder="Select Knowledge Bases for Website"
-                            variant="inverted"
-                            animation={2}
-                            maxCount={8}
-                          />
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                            <MultiSelect
+                              options={knowledgeBasesforSelection}
+                              onValueChange={setDefaultKnowledgeBase}
+                              defaultValue={defaultKnowledgeBase}
+                              placeholder="Select Knowledge Bases"
+                              variant="inverted"
+                              animation={2}
+                              maxCount={8}
+                            />
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    ) : (
+                      <span className="text-sm font-semibold">
+                        Loading Knowledge Bases...
+                      </span>
+                    )}
 
                     {/*AI Model*/}
                     <FormField
