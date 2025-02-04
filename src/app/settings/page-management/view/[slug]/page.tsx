@@ -11,42 +11,35 @@ import Link from "next/link";
 import henceforthApi from "@/utils/henceforthApis";
 
 // Mock data function - replace with actual data fetching
-const getPageContent = (slug: string) => {
-  slug = decodeURIComponent(slug);
-  const contents = {
-    "about-us": `
-      <h2>About Us</h2>
-      <p>We are a company dedicated to excellence...</p>
-    `,
-    "privacy-policy": `
-      <h2>Privacy Policy</h2>
-      <p>Last updated: January 12, 2024</p>
-      <p>This Privacy Policy describes how we collect, use, and handle your personal information...</p>
-    `,
-    "terms-&-conditions": `
-      <h2>Terms and Conditions</h2>
-      <p>Last updated: January 12, 2024</p>
-      <p>Please read these Terms and Conditions carefully...</p>
-    `,
-  };
-  return contents[slug] || "Content not found";
-};
 
 export default function ViewPage({ params }: { params: { slug: string } }) {
-  const [contentPage, setContentPage] = React.useState<{
-    title: any;
-    content: any;
-  }>({ title: "", content: "" });
+  const [contentPage, setContentPage] = React.useState({
+    title: "",
+    content: "",
+  });
+  const [loading, setLoading] = React.useState(false);
 
-  const getPageContent = (slug: string) => {
+  const getPageContent = async (slug: string) => {
+    setLoading(true);
     try {
-      const apiRes = henceforthApi.SuperAdmin.getPageContent(slug);
+      const apiRes = await henceforthApi.SuperAdmin.getPageContent(slug);
+      console.log(apiRes);
+      const pageType = apiRes?.data?.page_type
+        ?.split("_")
+        ?.map(
+          (word) =>
+            word?.charAt(0)?.toUpperCase() + word?.slice(1)?.toLowerCase()
+        )
+        .join(" ");
       setContentPage((prev) => ({
         ...prev,
-        title: apiRes?.data?.page_type,
+        title: pageType,
         content: apiRes?.data?.description,
       }));
-    } catch (error) {}
+    } catch (error) {
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -58,7 +51,11 @@ export default function ViewPage({ params }: { params: { slug: string } }) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2">
-              {contentPage?.title}
+              {loading ? (
+                <div className="h-6 w-32 animate-pulse rounded-md bg-gray-200" />
+              ) : (
+                contentPage?.title
+              )}
             </CardTitle>
             <Link href="/settings/page-management">
               <Button variant="outline" className="flex items-center gap-2">
@@ -69,7 +66,18 @@ export default function ViewPage({ params }: { params: { slug: string } }) {
           </CardHeader>
           <CardContent>
             <ScrollArea className="h-[60vh] w-full rounded-md border p-4">
-              <div dangerouslySetInnerHTML={{ __html: contentPage?.content }} />
+              {loading ? (
+                <div className="space-y-4">
+                  <div className="h-4 w-full animate-pulse rounded bg-gray-200" />
+                  <div className="h-4 w-3/4 animate-pulse rounded bg-gray-200" />
+                  <div className="h-4 w-5/6 animate-pulse rounded bg-gray-200" />
+                  <div className="h-4 w-2/3 animate-pulse rounded bg-gray-200" />
+                </div>
+              ) : (
+                <div
+                  dangerouslySetInnerHTML={{ __html: contentPage?.content }}
+                />
+              )}
             </ScrollArea>
           </CardContent>
         </Card>

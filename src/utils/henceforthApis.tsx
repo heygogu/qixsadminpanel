@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { request } from "http";
 import _superagent from "superagent";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const SuperagentPromise = require("superagent-promise");
@@ -153,6 +154,12 @@ const SuperAdmin = {
   getPageContent: (id: string) => requests.get(`admin/content/${id}`),
   updatePageContent: (info: any) => requests.put(`admin/content`, info),
   createNewPage: (info: any) => requests.post("admin/content", info),
+
+  //notification
+  vendorNotificationListing: (q: any) =>
+    requests.get(`admin/notification/vendor${q ? `?${q}` : ""}`),
+  sendNotification: (info: any) =>
+    requests.post("admin/notification/send", info),
 };
 
 const KB = {
