@@ -105,7 +105,7 @@ const SuperAdmin = {
 
   //knowledgebase
   getKnowledgeBases: (q?: any) =>
-    requests.get(`knowledge-base${q ? `?${q}` : ""}`),
+    requests.get(`admin/knowledge-base${q ? `?${q}` : ""}`),
 
   //agent-templates
   addAgentTemplate: (info: any) => requests.post("admin/ai-agent", info),
