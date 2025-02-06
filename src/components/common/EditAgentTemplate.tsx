@@ -48,7 +48,7 @@ import { cn } from "@/lib/utils";
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   voice: z.string().optional(),
-  phone: z.string().optional(),
+  twilio_config: z.string().optional(),
   model: z.string(),
   knowledgeBase: z.array(z.string()).optional(),
   idleReminder: z.boolean().optional(),
@@ -86,6 +86,7 @@ function EditAgentTemplate() {
 
   const [defaultKnowledgeBase, setDefaultKnowledgeBase] = useState<any>([]);
   console.log(defaultKnowledgeBase, "defaultKnowledgeBase");
+  const [phoneNumberListing, setPhoneNumberListing] = useState<any>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -109,7 +110,7 @@ function EditAgentTemplate() {
           form.reset({
             name: apiRes?.data?.name,
             voice: apiRes?.data?.voice ?? "",
-            phone: apiRes?.data?.phone_no ?? "",
+            twilio_config: apiRes?.data?.twilio_config?._id ?? "",
             model: apiRes?.data?.ai_model,
             knowledgeBase: defaultKnowledgeBase,
             idleReminder: apiRes?.data?.idle_reminder,
@@ -141,6 +142,15 @@ function EditAgentTemplate() {
         toast.error("Failed to fetch knowledge bases");
       }
     };
+    const getPhoneNumbers = async () => {
+      try {
+        const apiRes = await henceforthApi.SuperAdmin.getPhoneNumbers();
+        setPhoneNumberListing(apiRes);
+      } catch (error) {
+        setPhoneNumberListing([]);
+      }
+    };
+    getPhoneNumbers();
 
     fetchAgentData();
     getKnowledgeBaseOptions();
@@ -197,7 +207,7 @@ function EditAgentTemplate() {
       chat_prompt: values.chat_prompt,
       call_first_message: values.call_firstMessage,
       call_prompt: values.call_prompt,
-      phone_no: values.phone,
+      twilio_config: values.twilio_config,
       country_code: "+91",
       knowledge_base_id: defaultKnowledgeBase,
       ai_model: values.model,
@@ -332,8 +342,8 @@ function EditAgentTemplate() {
                           <SelectContent className="bg-white">
                             <SelectItem value="gemini">Gemini</SelectItem>
                             <SelectItem value="chatgpt">ChatGPT</SelectItem>
-                            {/* <SelectItem value="perplexity">Perplexity</SelectItem>
-                                                          <SelectItem value="claude">Claude</SelectItem> */}
+                            <SelectItem value="deepseek">DeepSeek</SelectItem>
+                            <SelectItem value="claude">Claude</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -514,12 +524,27 @@ function EditAgentTemplate() {
                 <div className="grid grid-cols-1 gap-6">
                   <FormField
                     control={form.control}
-                    name="phone"
+                    name="twilio_config"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Phone Number</FormLabel>
                         <FormControl>
-                          <Input placeholder="+1234567890" {...field} />
+                          <Select
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            defaultValue=""
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Phone Number" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-white">
+                              {phoneNumberListing?.map((option: any) => (
+                                <SelectItem value={option?._id}>
+                                  {option?.phone_number}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </FormControl>
                         <FormMessage />
                       </FormItem>

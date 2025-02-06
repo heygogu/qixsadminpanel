@@ -128,10 +128,9 @@ function AgentsPage() {
     },
 
     {
-      accessorKey: "phone_no",
       header: "Phone Number",
       cell: ({ row }: { row: any }) => {
-        return <div>{row?.getValue("phone") ?? "N/A"}</div>;
+        return <div>{row?.original?.twilio_config?.phone_number ?? "N/A"}</div>;
       },
     },
     {

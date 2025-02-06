@@ -82,6 +82,9 @@ const SuperAdmin = {
   updateProfile: (info: any) => requests.put("admin/profile", info),
   updatePassword: (info: any) => requests.put("admin/password", info),
 
+  //for agent listing
+  getPhoneNumbers: (q?: any) => requests.get(`admin/twilio/numbers`),
+
   //dashboard
   getDashboardStats: (q: any) =>
     requests.get(`admin/dashboard/overview${q ? `?${q}` : ""}`),
