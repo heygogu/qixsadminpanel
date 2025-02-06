@@ -119,7 +119,9 @@ const StaffListing = () => {
           <Avatar className="w-12 h-12 border-4 border-white shadow-lg">
             <AvatarImage
               className="object-cover"
-              src={henceforthApi?.FILES?.imageOriginal(row.original?.image)}
+              src={henceforthApi?.FILES?.imageOriginal(
+                row.original?.profile_pic
+              )}
               alt={row.original?.name}
             />
             <AvatarFallback>
