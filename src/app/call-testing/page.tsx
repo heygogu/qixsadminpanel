@@ -400,6 +400,10 @@ const PhoneNumberSubmission = () => {
                               <SelectContent>
                                 <SelectItem value="gemini">Gemini</SelectItem>
                                 <SelectItem value="chatgpt">ChatGPT</SelectItem>
+                                <SelectItem value="deepseek">
+                                  DeepSeek
+                                </SelectItem>
+                                <SelectItem value="claude">Claude</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />

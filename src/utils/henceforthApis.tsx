@@ -82,6 +82,15 @@ const SuperAdmin = {
   updateProfile: (info: any) => requests.put("admin/profile", info),
   updatePassword: (info: any) => requests.put("admin/password", info),
 
+  //dashboard
+  getDashboardStats: (q: any) =>
+    requests.get(`admin/dashboard/overview${q ? `?${q}` : ""}`),
+
+  getSubscriptionListing: (q: any) =>
+    requests.get(`admin/dashboard/subscription${q ? `?${q}` : ""}`),
+  getDashboardVendorListing: (q: any) =>
+    requests.get(`admin/dashboard/vendors${q ? `?${q}` : ""}`),
+
   //vendors
   vendorListing: (q: any) => requests.get(`admin/vendor${q ? `?${q}` : ""}`),
   vendorDetail: (id: string) => requests.get(`admin/vendor/${id}`),

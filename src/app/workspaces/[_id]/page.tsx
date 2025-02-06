@@ -6,7 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/common/data-table";
 
-import { Building2, Users, CreditCard, Lock, Eye, User } from "lucide-react";
+import {
+  Building2,
+  Users,
+  CreditCard,
+  Lock,
+  Eye,
+  User,
+  Shield,
+  Crown,
+} from "lucide-react";
 import PageContainer from "@/components/layouts/page-container";
 import DashboardLayout from "@/components/layouts/dashboard-layout";
 import henceforthApi from "@/utils/henceforthApis";
@@ -111,7 +120,7 @@ const WorkspaceModule = () => {
     {
       accessorKey: "amount",
       header: "Amount",
-      cell: ({ row }) => `$${row.original.amount}`,
+      cell: ({ row }) => `₹${row.original.amount}`,
     },
     {
       accessorKey: "created_on",
@@ -159,6 +168,24 @@ const WorkspaceModule = () => {
     {
       accessorKey: "role",
       header: "Role",
+      cell: ({ row }) => (
+        <span
+          className={`flex items-center gap-2 w-24 ${
+            row.original.role === "OWNER"
+              ? " text-yellow-600"
+              : row.original.role === "ADMIN"
+              ? "b text-blue-800"
+              : " text-gray-800"
+          }`}
+        >
+          {row.original.role === "OWNER" ? (
+            <Crown className="text-yellow-500" />
+          ) : (
+            <Shield className="text-blue-500" />
+          )}{" "}
+          {row.original.role}
+        </span>
+      ),
     },
     {
       accessorKey: "status",
@@ -184,7 +211,7 @@ const WorkspaceModule = () => {
       id: "actions",
       header: "Actions",
       cell: ({ row }) => (
-        <Link href={`/vendors/${row.original.vendor_id._id}/view`} passHref>
+        <Link href={`/vendors/${row.original.vendor_id?._id}/view`} passHref>
           <Button variant="ghost" size="icon">
             <Eye className="h-4 w-4" />
           </Button>
