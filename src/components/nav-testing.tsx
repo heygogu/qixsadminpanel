@@ -20,7 +20,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export function NavProjects({
+export function NavTest({
   items,
 }: {
   items: {
@@ -38,7 +38,7 @@ export function NavProjects({
   const realPathMatch = pathname.split("/")[1];
   return (
     <SidebarGroup>
-      <SidebarGroupLabel className="font-semibold">SUPPORT</SidebarGroupLabel>
+      <SidebarGroupLabel className="font-semibold">TESTING</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   BadgeCheck,
@@ -10,13 +10,9 @@ import {
   User,
   UserPlus,
   UserPlus2,
-} from "lucide-react"
+} from "lucide-react";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,31 +21,31 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar"
-import { useGlobalContext } from "@/app/providers/Provider"
-import henceforthApi from "@/app/utils/henceforthApis"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
+} from "@/components/ui/sidebar";
+import { useGlobalContext } from "@/app/providers/Provider";
+import henceforthApi from "@/utils/henceforthApis";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export function NavUser({
   user,
 }: {
   user: {
-    name: string
-    email: string
-    avatar: string
-  }
+    name: string;
+    email: string;
+    avatar: string;
+  };
 }) {
-  const { isMobile } = useSidebar()
+  const { isMobile } = useSidebar();
   const router = useRouter();
-  const globalContext = useGlobalContext()
-  const userInfo = globalContext?.userInfo
+  const globalContext = useGlobalContext();
+  const userInfo = globalContext?.userInfo;
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -60,12 +56,25 @@ export function NavUser({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-9 w-9 rounded-full border-primary-foreground border-4 shadow-lg">
-                <AvatarImage className="object-cover" src={henceforthApi?.FILES?.imageOriginal(userInfo?.profile_pic, "")} alt={userInfo?.name} />
-                <AvatarFallback className="rounded-full bg-secondary">SA</AvatarFallback>
+                <AvatarImage
+                  className="object-cover"
+                  src={henceforthApi?.FILES?.imageOriginal(
+                    userInfo?.profile_pic,
+                    ""
+                  )}
+                  alt={userInfo?.name}
+                />
+                <AvatarFallback className="rounded-full bg-secondary">
+                  SA
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{userInfo?.name ?? "Super Admin"}</span>
-                <span className="truncate text-xs">{userInfo?.email ?? "admin@gmail.com"}</span>
+                <span className="truncate font-semibold">
+                  {userInfo?.name ?? "Super Admin"}
+                </span>
+                <span className="truncate text-xs">
+                  {userInfo?.email ?? "admin@gmail.com"}
+                </span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -79,12 +88,24 @@ export function NavUser({
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-10 w-10 rounded-full border-4 border-primary-foreground shadow-lg">
-                  <AvatarImage src={henceforthApi?.FILES?.imageOriginal(userInfo?.profile_pic, "")} alt={userInfo?.name} />
-                  <AvatarFallback className="rounded-circle bg-secondary">SA</AvatarFallback>
+                  <AvatarImage
+                    src={henceforthApi?.FILES?.imageOriginal(
+                      userInfo?.profile_pic,
+                      ""
+                    )}
+                    alt={userInfo?.name}
+                  />
+                  <AvatarFallback className="rounded-circle bg-secondary">
+                    SA
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">{userInfo?.name ?? "Super Admin"}</span>
-                  <span className="truncate text-xs">{userInfo?.email ?? "admin@gmail.com"}</span>
+                  <span className="truncate font-semibold">
+                    {userInfo?.name ?? "Super Admin"}
+                  </span>
+                  <span className="truncate text-xs">
+                    {userInfo?.email ?? "admin@gmail.com"}
+                  </span>
                 </div>
               </div>
             </DropdownMenuLabel>
@@ -121,5 +142,5 @@ export function NavUser({
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }
