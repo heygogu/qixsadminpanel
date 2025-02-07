@@ -34,6 +34,11 @@ import { set } from "react-hook-form";
 import { useGlobalContext } from "@/app/providers/Provider";
 import { Skeleton } from "@/components/ui/skeleton";
 import PaginationCompo from "@/components/common/Pagination";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const WhiteLabelSubmissions = () => {
   const [listing, setListing] = useState({
@@ -105,7 +110,7 @@ const WhiteLabelSubmissions = () => {
 
   useEffect(() => {
     getListingData();
-  }, []);
+  }, [searchParams.get("search"), params?.pagination]);
   const getStatusBadge = (status) => {
     const variants = {
       new: "bg-green-100 text-green-800",
@@ -135,11 +140,28 @@ const WhiteLabelSubmissions = () => {
     },
     {
       header: "Phone",
-      accessorKey: "phone",
+      accessorKey: "phone_no",
+      cell: ({ row }) => (
+        <span>{row.original.country_code + row.original.phone_no}</span>
+      ),
     },
     {
       header: "Message",
       accessorKey: "message",
+      cell: ({ row }) => (
+        <Tooltip>
+          <TooltipTrigger>
+            <span>
+              {row.original.message.length > 30
+                ? row.original.message.slice(0, 30) + "..."
+                : row.original.message}
+            </span>
+          </TooltipTrigger>
+          <TooltipContent className="max-w-[300px] whitespace-normal break-words">
+            {row.original.message}
+          </TooltipContent>
+        </Tooltip>
+      ),
     },
     {
       header: "Status",

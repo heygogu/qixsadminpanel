@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -29,6 +29,9 @@ import DashboardLayout from "@/components/layouts/dashboard-layout";
 import PageContainer from "@/components/layouts/page-container";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
+import henceforthApi from "@/utils/henceforthApis";
+import { url } from "inspector";
+import { useGlobalContext } from "@/app/providers/Provider";
 
 // Validation schema
 const notificationSchema = z.object({
@@ -45,13 +48,6 @@ const notificationSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
 });
-
-// Mock data for vendors and members
-const MOCK_VENDORS = [
-  { label: "Vendor 1", value: "vendor1" },
-  { label: "Vendor 2", value: "vendor2" },
-  { label: "Vendor 3", value: "vendor3" },
-];
 
 const NotificationSettings = () => {
   const [isLoading, setIsLoading] = React.useState(false);
@@ -71,27 +67,73 @@ const NotificationSettings = () => {
 
   type Option = { label: string; value: string };
 
-  const mockSearch = async (value: string): Promise<Option[]> => {
-    // Simulate API call
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const filtered = MOCK_VENDORS.filter((option) =>
-          option.label.toLowerCase().includes(value.toLowerCase())
+  const [defaultOptions, setDefaultOptions] = React.useState<any>([]);
+  const [radioState, setRadioState] = React.useState("vendors");
+  const { Toast } = useGlobalContext();
+  const getVendors = async (value?: string) => {
+    try {
+      const urlSearchParams = new URLSearchParams();
+
+      if (value) {
+        urlSearchParams.set("search", value);
+      }
+      const apiRes = await henceforthApi.SuperAdmin.vendorNotificationListing(
+        value ? urlSearchParams.toString() : null
+      );
+      if (!value) {
+        setDefaultOptions(
+          apiRes?.data?.data?.map((vendor: any) => ({
+            label: vendor?.name + "-" + vendor?.email,
+            value: vendor?._id,
+          }))
         );
-        resolve(filtered);
-      }, 500);
-    });
+      }
+      return apiRes?.data?.data?.map((vendor: any) => ({
+        label: vendor?.name + "-" + vendor?.email,
+        value: vendor?._id,
+      }));
+    } catch (error) {}
   };
+
+  useEffect(() => {
+    getVendors();
+  }, []);
 
   const onSubmit = async (data: z.infer<typeof notificationSchema>) => {
     setIsLoading(true);
     try {
+      // {
+      //   "is_send_to_all": true,
+      //   "vendor_ids": [
+      //     "string"
+      //   ],
+      //   "notification_type": "EMAIL",
+      //   "title": "Title...",
+      //   "description": "Notification description..."
+
+      // }
+
+      const payload = {
+        is_send_to_all: data.userType === "vendors",
+        vendor_ids:
+          data.userType === "vendors"
+            ? []
+            : data?.selectedUsers?.map((user: Option) => user.value),
+        notification_type: data.notificationType.toUpperCase(),
+        title: data.title,
+        description: data.description,
+      };
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const apiRes = await henceforthApi.SuperAdmin.sendNotification(payload);
       console.log("Form submitted:", data);
-      form.reset();
+      Toast.success("Notification sent successfully");
+      form.reset({
+        notificationType: "email",
+        selectedUsers: [],
+      });
     } catch (error) {
       console.error("Error submitting form:", error);
+      Toast.error(error);
     } finally {
       setIsLoading(false);
     }
@@ -132,13 +174,12 @@ const NotificationSettings = () => {
                           <RadioGroup
                             onValueChange={field.onChange}
                             defaultValue={field.value}
-                            className="grid lg:grid-cols-8 grid-cols-2 "
+                            className="flex space-x-4"
                           >
                             <div className="flex items-center space-x-2">
                               <RadioGroupItem value="vendors" id="vendors" />
                               <label htmlFor="vendors">All Vendors</label>
                             </div>
-
                             <div className="flex items-center space-x-2">
                               <RadioGroupItem
                                 value="selectedVendors"
@@ -166,18 +207,13 @@ const NotificationSettings = () => {
                             <MultipleSelector
                               value={field.value}
                               onChange={field.onChange}
-                              defaultOptions={MOCK_VENDORS}
+                              defaultOptions={defaultOptions}
                               onSearch={async (value) => {
-                                // setIsTriggered(true);
-                                const res = await mockSearch(value);
-                                // setIsTriggered(false);
+                                const res = await getVendors(value);
+
                                 return res;
                               }}
-                              placeholder={`Search ${
-                                userType === "selectedVendors"
-                                  ? "vendors"
-                                  : "members"
-                              }...`}
+                              placeholder={`Search vendors...`}
                               loadingIndicator={
                                 <p className="py-2 text-center text-muted-foreground">
                                   Loading...

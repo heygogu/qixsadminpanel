@@ -72,6 +72,12 @@ interface Vendor {
   ai_human_notification: boolean;
   created_at: number;
   updated_at: number;
+  workspace: {
+    _id: string;
+    name: string;
+    logo: string;
+    color: string;
+  }[];
 }
 // Column definitions for vendor listing
 
@@ -208,15 +214,44 @@ const VendorListing = () => {
     //     ),
     // },
     {
-      accessorKey: "role",
-      header: "Role",
+      header: "Workspace",
+      accessorKey: "workspace",
       cell: ({ row }) => (
-        <div className="flex items-center gap-2">
-          <Shield className="h-4 w-4 text-primary" />
-          <span className="capitalize">
-            {row.original.type.slice(0, 1) +
-              row.original.type.slice(1).toLowerCase()}
-          </span>
+        <div className="flex flex-wrap gap-1 w-[200px]">
+          {row.original.workspace?.slice(0, 3)?.map((workspace) => (
+            <Badge
+              key={workspace.name}
+              variant="secondary"
+              className="bg-gray-200 shadow-md capitalize text-gray-800"
+            >
+              {workspace.name}
+            </Badge>
+          ))}
+          {row.original.workspace?.length > 3 && (
+            <Tooltip>
+              <TooltipTrigger>
+                <Badge
+                  variant="secondary"
+                  className="bg-gray-100 capitalize text-gray-800 cursor-pointer"
+                >
+                  +{row.original.workspace.length - 3}
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent>
+                <div className="flex flex-col gap-1">
+                  {row.original.workspace?.map((workspace) => (
+                    <Badge
+                      key={workspace.name}
+                      variant="secondary"
+                      className="bg-gray-100 capitalize text-gray-800"
+                    >
+                      {workspace.name}
+                    </Badge>
+                  ))}
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
       ),
     },
@@ -342,7 +377,7 @@ const VendorListing = () => {
                       <SelectItem value="inactive">Inactive</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Select>
+                  {/* <Select>
                     <SelectTrigger className="w-[150px]">
                       <SelectValue placeholder="Role" />
                     </SelectTrigger>
@@ -350,7 +385,7 @@ const VendorListing = () => {
                       <SelectItem value="designer">Designer</SelectItem>
                       <SelectItem value="developer">Developer</SelectItem>
                     </SelectContent>
-                  </Select>
+                  </Select> */}
                   <Button variant="outline" size="icon">
                     <Filter className="h-4 w-4" />
                   </Button>

@@ -1,4 +1,3 @@
-// app/page-management/edit/[slug]/page.tsx
 "use client";
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +10,9 @@ import PageContainer from "@/components/layouts/page-container";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import "react-quill/dist/quill.snow.css";
+import henceforthApi from "@/utils/henceforthApis";
+import { useRouter } from "next/navigation";
+import { useGlobalContext } from "@/app/providers/Provider";
 
 const ReactQuill = dynamic(() => import("react-quill"), {
   ssr: false,
@@ -47,46 +49,61 @@ const formats = [
   "link",
 ];
 
-// Mock data function - replace with actual data fetching
-const getPageContent = (slug: string) => {
-  slug = decodeURIComponent(slug);
-  const contents = {
-    "about-us": `
-      <h2>About Us</h2>
-      <p>We are a company dedicated to excellence...</p>
-    `,
-    "privacy-policy": `
-      <h2>Privacy Policy</h2>
-      <p>Last updated: January 12, 2024</p>
-      <p>This Privacy Policy describes how we collect, use, and handle your personal information...</p>
-    `,
-    "terms-&-conditions": `
-      <h2>Terms and Conditions</h2>
-      <p>Last updated: January 12, 2024</p>
-      <p>Please read these Terms and Conditions carefully...</p>
-    `,
-  };
-  return contents[slug] || "Content not found";
-};
-
 export default function EditPage({ params }: { params: { slug: string } }) {
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState({
+    title: "",
+    content: "",
+  });
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
+  const getPageContent = async () => {
+    setLoading(true);
+    try {
+      const apiRes = await henceforthApi.SuperAdmin.getPageContent(
+        params?.slug
+      );
+      const pageType = apiRes?.data?.page_type
+        ?.split("_")
+        ?.map(
+          (word) =>
+            word?.charAt(0)?.toUpperCase() + word?.slice(1)?.toLowerCase()
+        )
+        .join(" ");
+      setContent({
+        title: pageType,
+        content: apiRes?.data?.description,
+      });
+    } catch (error) {
+      console.error("Error fetching page content:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    setContent(getPageContent(params.slug));
+    getPageContent();
   }, [params.slug]);
 
-  const title = decodeURIComponent(params.slug)
-    .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-
+  const router = useRouter();
+  const { Toast } = useGlobalContext();
   const handleSave = async () => {
     setSaving(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setSaving(false);
+    const info = {
+      description: content.content,
+      _id: params.slug,
+    };
+    try {
+      const apiRes = await henceforthApi.SuperAdmin.updatePageContent(info);
+      console.log(apiRes);
+      Toast.success("Content saved successfully");
+      router.push("/settings/page-management");
+    } catch (error) {
+      console.error(error);
+      Toast.error(error);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -96,7 +113,7 @@ export default function EditPage({ params }: { params: { slug: string } }) {
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <PenSquare className="h-6 w-6" />
-              {title}
+              {loading ? <Skeleton className="h-6 w-32" /> : content.title}
             </CardTitle>
             <div className="flex gap-2">
               <Link href="/settings/page-management">
@@ -107,7 +124,7 @@ export default function EditPage({ params }: { params: { slug: string } }) {
               </Link>
               <Button
                 onClick={handleSave}
-                disabled={saving}
+                disabled={saving || loading}
                 className="flex items-center gap-2"
               >
                 <Save className="h-4 w-4" />
@@ -117,14 +134,20 @@ export default function EditPage({ params }: { params: { slug: string } }) {
           </CardHeader>
           <CardContent>
             <ScrollArea className="h-[60vh]">
-              <ReactQuill
-                value={content}
-                onChange={setContent}
-                modules={modules}
-                formats={formats}
-                theme="snow"
-                className="h-[calc(60vh-60px)]"
-              />
+              {loading ? (
+                <QuillLoader />
+              ) : (
+                <ReactQuill
+                  value={content.content}
+                  onChange={(value) =>
+                    setContent((prev) => ({ ...prev, content: value }))
+                  }
+                  modules={modules}
+                  formats={formats}
+                  theme="snow"
+                  className="h-[calc(60vh-60px)]"
+                />
+              )}
             </ScrollArea>
           </CardContent>
         </Card>

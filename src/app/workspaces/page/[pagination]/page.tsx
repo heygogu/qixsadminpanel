@@ -16,6 +16,7 @@ import {
   User,
   Building,
   LockOpen,
+  IndianRupee,
 } from "lucide-react";
 import PageContainer from "@/components/layouts/page-container";
 import DashboardLayout from "@/components/layouts/dashboard-layout";
@@ -103,7 +104,10 @@ const WorkspaceModule = () => {
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
           <Avatar className="h-10 w-10 shadow-md border-2 border-white">
-            <AvatarImage src={row.original.image} alt={row.original.name} />
+            <AvatarImage
+              src={henceforthApi.FILES.imageOriginal(row.original.image, "")}
+              alt={row.original.name}
+            />
             <AvatarFallback>
               <Building2 className="h-4 w-4" />
             </AvatarFallback>
@@ -113,7 +117,6 @@ const WorkspaceModule = () => {
       ),
     },
     {
-      accessorKey: "owner_data",
       header: "Owner",
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
@@ -128,7 +131,7 @@ const WorkspaceModule = () => {
               <User className="h-4 w-4" />
             </AvatarFallback>
           </Avatar>
-          <span>{row.original?.name}</span>
+          <span>{row.original?.owner_data?.name}</span>
         </div>
       ),
     },
@@ -169,7 +172,7 @@ const WorkspaceModule = () => {
       header: "Amount",
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
-          <CreditCard className="h-4 w-4 text-gray-500" />$
+          <CreditCard className="h-4 w-4 text-gray-500" />₹
           {row.original.amount ?? 100}
         </div>
       ),

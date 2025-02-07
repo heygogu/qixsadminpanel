@@ -40,7 +40,7 @@ import {
   Phone,
   User,
 } from "lucide-react";
-import toast from "react-hot-toast";
+// import Toast from "react-hot-Toast";
 import henceforthApi from "@/utils/henceforthApis";
 import { MultiSelect } from "@/components/common/MultiSelect";
 import { useGlobalContext } from "@/app/providers/Provider";
@@ -50,7 +50,7 @@ const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   // image: z.string().url("Please enter a valid URL").optional(),
   voice: z.string().optional(),
-  phone: z.string().optional(),
+  twilio_config: z.string().optional(),
   model: z.string(),
   knowledgeBase: z.array(z.string()).optional(),
   idleReminder: z.boolean(),
@@ -86,13 +86,14 @@ function AddTemplate() {
   const router = useRouter();
 
   const [logoFile, setLogoFile] = useState<File | null>(null);
-  const { userInfo } = useGlobalContext();
+  const { userInfo, Toast } = useGlobalContext();
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [isImageLoading, setIsImageLoading] = useState(false);
   const [photoString, setPhotoString] = useState<string | null>(
     userInfo?.workspace?.workspace_id?.image
   );
   const [knowledgeBaseOptions, setKnowledgeBaseOptions] = useState<any>([]);
+  const [phoneNumberListing, setPhoneNumberListing] = useState<any>([]);
 
   const handleLogoUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -103,12 +104,12 @@ function AddTemplate() {
       const maxSize = 5 * 1024 * 1024; // 5MB
 
       if (!validTypes.includes(file.type)) {
-        toast.error("Invalid file type. Please upload JPEG, PNG, or WebP.");
+        Toast.error("Invalid file type. Please upload JPEG, PNG, or WebP.");
         return;
       }
 
       if (file.size > maxSize) {
-        toast.error("File is too large. Maximum size is 5MB.");
+        Toast.error("File is too large. Maximum size is 5MB.");
         return;
       }
 
@@ -127,7 +128,7 @@ function AddTemplate() {
         const apiRes = await henceforthApi.SuperAdmin.imageUpload(formData);
         setPhotoString(apiRes?.file_name);
       } catch (error) {
-        toast.error("Failed to upload image");
+        Toast.error("Failed to upload image");
       } finally {
         setIsImageLoading(false);
       }
@@ -153,7 +154,7 @@ function AddTemplate() {
       chat_prompt: values.chat_prompt,
       call_first_message: values.call_firstMessage,
       call_prompt: values.call_prompt,
-      phone_no: values.phone,
+      twilio_config: values.twilio_config,
       country_code: "+91",
       knowledge_base_id: values.knowledgeBase,
       ai_model: values.model,
@@ -167,10 +168,11 @@ function AddTemplate() {
 
     try {
       const apiRes = await henceforthApi.SuperAdmin.addAgentTemplate(payload);
-      toast.success("Agent created successfully");
+      Toast.success("Agent created successfully");
+      router.push("/ai-agents/page/1");
     } catch (error) {
+      Toast.error(error);
     } finally {
-      router.push("/aiagents/page/1");
     }
   }
 
@@ -182,6 +184,14 @@ function AddTemplate() {
         setKnowledgeBaseOptions(apiRes?.data);
       } catch (error) {}
     };
+    const getPhoneNumbers = async () => {
+      try {
+        const apiRes = await henceforthApi.SuperAdmin.getPhoneNumbers();
+        console.log(apiRes?.data, "apiRes?.data");
+        setPhoneNumberListing(apiRes);
+      } catch (error) {}
+    };
+    getPhoneNumbers();
     getKnowledgeBaseOptions();
   }, []);
   return (
@@ -293,8 +303,8 @@ function AddTemplate() {
                           <SelectContent className="bg-white">
                             <SelectItem value="gemini">Gemini</SelectItem>
                             <SelectItem value="chatgpt">ChatGPT</SelectItem>
-                            {/* <SelectItem value="perplexity">Perplexity</SelectItem>
-                                                        <SelectItem value="claude">Claude</SelectItem> */}
+                            <SelectItem value="deepseek">DeepSeek</SelectItem>
+                            <SelectItem value="claude">Claude</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -492,12 +502,35 @@ function AddTemplate() {
                 <div className="grid grid-cols-1 gap-6">
                   <FormField
                     control={form.control}
-                    name="phone"
+                    name="twilio_config"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Phone Number</FormLabel>
                         <FormControl>
-                          <Input placeholder="+1234567890" {...field} />
+                          <Select
+                            value={field.value}
+                            onValueChange={field.onChange}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Phone Number" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-white">
+                              {phoneNumberListing?.length > 0 ? (
+                                phoneNumberListing?.map((option: any) => (
+                                  <SelectItem
+                                    key={option?._id}
+                                    value={option?._id}
+                                  >
+                                    {option?.phone_number}
+                                  </SelectItem>
+                                ))
+                              ) : (
+                                <SelectItem value="nodata" disabled>
+                                  No phone number available
+                                </SelectItem>
+                              )}
+                            </SelectContent>
+                          </Select>
                         </FormControl>
                         <FormMessage />
                       </FormItem>

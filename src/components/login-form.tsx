@@ -32,6 +32,7 @@ export function LoginForm({
   // const [userInfo, setUserInfo] = React.useState<AdminInfo | null>(null)
   const { getProfile, Toast } = useGlobalContext();
   const router = useRouter();
+  const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("qwerty");
   const [showPassword, setShowPassword] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -57,7 +58,7 @@ export function LoginForm({
             path: "/",
           }
         );
-        // await getProfile()
+        await getProfile();
         router.replace("/dashboard");
       }
     } catch (error) {
@@ -89,7 +90,8 @@ export function LoginForm({
                 <Input
                   id="email"
                   type="email"
-                  value={"admin@gmail.com"}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="m@example.com"
                   required
                 />
@@ -119,9 +121,9 @@ export function LoginForm({
                       className="absolute inset-y-0 right-0 flex items-center pr-3"
                     >
                       {showPassword ? (
-                        <EyeOff className="w-4 h-4 text-gray-500 transition duration-300 ease-in-out" />
-                      ) : (
                         <Eye className="w-4 h-4 text-gray-500 transition duration-300 ease-in-out" />
+                      ) : (
+                        <EyeOff className="w-4 h-4 text-gray-500 transition duration-300 ease-in-out" />
                       )}
                     </button>
                   )}

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { request } from "http";
 import _superagent from "superagent";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const SuperagentPromise = require("superagent-promise");
@@ -78,6 +79,20 @@ const requests = {
 const SuperAdmin = {
   login: (info: any) => requests.post("admin/login", info),
   profile: () => requests.get(`admin/profile`),
+  updateProfile: (info: any) => requests.put("admin/profile", info),
+  updatePassword: (info: any) => requests.put("admin/password", info),
+
+  //for agent listing
+  getPhoneNumbers: (q?: any) => requests.get(`admin/twilio/numbers`),
+
+  //dashboard
+  getDashboardStats: (q: any) =>
+    requests.get(`admin/dashboard/overview${q ? `?${q}` : ""}`),
+
+  getSubscriptionListing: (q: any) =>
+    requests.get(`admin/dashboard/subscription${q ? `?${q}` : ""}`),
+  getDashboardVendorListing: (q: any) =>
+    requests.get(`admin/dashboard/vendors${q ? `?${q}` : ""}`),
 
   //vendors
   vendorListing: (q: any) => requests.get(`admin/vendor${q ? `?${q}` : ""}`),
@@ -102,15 +117,17 @@ const SuperAdmin = {
 
   //knowledgebase
   getKnowledgeBases: (q?: any) =>
-    requests.get(`knowledge-base${q ? `?${q}` : ""}`),
+    requests.get(`admin/knowledge-base${q ? `?${q}` : ""}`),
 
   //agent-templates
-  addAgentTemplate: (info: any) => requests.post("agent-template", info),
+  addAgentTemplate: (info: any) => requests.post("admin/ai-agent", info),
   agentTemplateListing: (q: any) =>
-    requests.get(`agent-template${q ? `?${q}` : ""}`),
-  getAgentTemplateDetails: (id: string) => requests.get(`agent-template/${id}`),
+    requests.get(`admin/ai-agent${q ? `?${q}` : ""}`),
+  getAgentTemplateDetails: (id: string) => requests.get(`admin/ai-agent/${id}`),
   updateAgentTemplate: (id: string, info: any) =>
-    requests.put(`agent-template/${id}`, info),
+    requests.put(`admin/ai-agent/${id}`, info),
+  deleteAgentTemplate: (id: string) =>
+    requests.deleteOne(`admin/ai-agent/${id}`),
 
   //website-testing
   websiteTesting: (info: any) => requests.put("agent/default/web", info),
@@ -127,6 +144,56 @@ const SuperAdmin = {
   //whitelist data
   whiteLabelListing: (q?: any) =>
     requests.get(`admin/white-label${q ? `?${q}` : ""}`),
+
+  //ticket listing
+  getTickets: (q?: any) => requests.get(`admin/contactus${q ? `?${q}` : ""}`),
+  getTicketDetails: (id: string) => requests.get(`admin/contactus/${id}`),
+  updateTicketStatus: (id: string, info: any) =>
+    requests.put(`admin/contactus/${id}`, info),
+  deleteTicket: (id: string) => requests.deleteOne(`admin/contactus/${id}`),
+
+  // ---------------*** Settings ***--------------------
+  //staff
+  staffListing: (q: any) => requests.get(`admin/staff/list${q ? `?${q}` : ""}`),
+  createStaff: (info: any) => requests.post("admin/staff", info),
+  editStaff: (id: string, info: any) => requests.put(`admin/staff/${id}`, info),
+  getStaffDetails: (id: string) => requests.get(`admin/staff/${id}`),
+  deleteStaff: (id: string) => requests.deleteOne(`admin/staff/${id}`),
+
+  //page-management
+  contentPageListing: (q?: any) =>
+    requests.get(`admin/content${q ? `?${q}` : ""}`),
+  getPageContent: (id: string) => requests.get(`admin/content/${id}`),
+  updatePageContent: (info: any) => requests.put(`admin/content`, info),
+  createNewPage: (info: any) => requests.post("admin/content", info),
+
+  //notification
+  vendorNotificationListing: (q: any) =>
+    requests.get(`admin/notification/vendor${q ? `?${q}` : ""}`),
+  sendNotification: (info: any) =>
+    requests.post("admin/notification/send", info),
+};
+
+const KB = {
+  post: (url: string, key: string, value: any, body: any) =>
+    requests.fileWithBody(`${url}`, key, value, body),
+  postDocument: (url: string, info: any) => requests.post(url, info),
+  createKnowledgeBase: (info: any) =>
+    requests.post(`admin/knowledge-base`, info),
+  deleteDocuments: () => requests.deleteOne(`admin/pinecone/document`),
+  getKnowledgeBases: (q?: any) =>
+    requests.get(`admin/knowledge-base${q ? `?${q}` : ""}`),
+  getDocuments: (id: any, q?: any) =>
+    requests.get(`admin/knowledge-base/${id}/documents${q ? `?${q}` : ""}`),
+  deleteKnowledgeBase: (id: any) =>
+    requests.deleteOne(`admin/knowledge-base/${id}`),
+  // getDocument: (url: string) => requests.get(url),
+  addUrlDocument: (info: any) =>
+    requests.post(`admin/knowledge-base/url-upload`, info),
+  textUpload: (info: any) =>
+    requests.post(`admin/knowledge-base/text-upload`, info),
+  deleteKbDocuments: (id: any) =>
+    requests.deleteOne(`admin/knowledge-base/documents/${id}`),
 };
 
 const Auth = {
@@ -203,6 +270,7 @@ const henceforthApi = {
   FILES,
   token,
   encode,
+  KB,
   setToken: (_token?: string) => {
     token = _token;
   },

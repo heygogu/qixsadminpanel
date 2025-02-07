@@ -28,6 +28,7 @@ interface GroupOption {
 }
 
 interface MultipleSelectorProps {
+  searchTerm?: string;
   value?: Option[];
   defaultOptions?: Option[];
   /** manually controlled options */
@@ -193,6 +194,7 @@ const MultipleSelector = React.forwardRef<
       emptyIndicator,
       maxSelected = Number.MAX_SAFE_INTEGER,
       onMaxSelected,
+      searchTerm,
       hidePlaceholderWhenSelected,
       disabled,
       groupBy,
@@ -220,6 +222,14 @@ const MultipleSelector = React.forwardRef<
     const [inputValue, setInputValue] = React.useState("");
     const debouncedSearchTerm = useDebounce(inputValue, delay || 500);
 
+    const [internalSearchTerm, setInternalSearchTerm] = React.useState("");
+
+    React.useEffect(() => {
+      // Reset internal search term when prop changes
+      if (searchTerm !== undefined) {
+        setInternalSearchTerm(searchTerm);
+      }
+    }, [searchTerm]);
     React.useImperativeHandle(
       ref,
       () => ({
