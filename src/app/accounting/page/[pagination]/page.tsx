@@ -34,7 +34,15 @@ import {
 } from "lucide-react";
 import PageContainer from "@/components/layouts/page-container";
 import DashboardLayout from "@/components/layouts/dashboard-layout";
-import { FaRupeeSign } from "react-icons/fa6";
+import {
+  FaCashRegister,
+  FaMoneyBill,
+  FaMoneyBill1,
+  FaMoneyBill1Wave,
+  FaMoneyBillTrendUp,
+  FaMoneyBillWave,
+  FaRupeeSign,
+} from "react-icons/fa6";
 
 // Mock data for accounting entries
 const accountingData = [
@@ -159,7 +167,7 @@ const AccountingModule = () => {
                   </h3>
                 </div>
                 <div className="p-2 bg-blue-500 rounded-lg text-white">
-                  <FaRupeeSign className="h-5 w-5" />
+                  <FaMoneyBill1Wave className="h-5 w-5" />
                 </div>
               </div>
             </CardContent>

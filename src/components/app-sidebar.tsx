@@ -15,6 +15,8 @@ import {
   BellIcon,
   FileCheck,
   Building2,
+  KeyIcon,
+  DollarSign,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -70,6 +72,11 @@ const data = {
     {
       title: "Accounting",
       url: "/accounting/page/1",
+      icon: DollarSign,
+    },
+    {
+      title: "Staff",
+      url: "/staff/page/1",
       icon: UserRoundPen,
     },
     {
@@ -99,13 +106,15 @@ const data = {
   ],
   testing: [
     {
-      title: "Website Testing",
-      url: "/website-testing",
-      icon: TestTube2,
-      items: [],
+      title: "Default Agent",
+
+      icon: BotIcon,
+
+      url: "/default-agent/page/1",
     },
+
     {
-      title: "Call Testing",
+      title: "QIXS Call Test",
       url: "/call-testing",
       icon: PhoneIncoming,
       items: [],
@@ -118,15 +127,21 @@ const data = {
       icon: Settings,
       items: [
         {
+          title: "Key Management",
+          icon: KeyIcon,
+          url: "/settings/key-management/page/1",
+        },
+        {
+          title: "Phone Settings",
+          icon: PhoneIncoming,
+          url: "/settings/phone-settings/page/1",
+        },
+        {
           title: "Page Management",
           url: "/settings/page-management",
           icon: FileCheck,
         },
-        {
-          title: "Staff",
-          url: "/settings/staff/page/1",
-          icon: UserRoundPen,
-        },
+
         {
           title: "Notifications ",
           url: "/settings/notifications",
@@ -163,9 +178,16 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
     {
       value: "accounting",
       label: "Accounting",
-      icon: UserRoundPen,
+      icon: DollarSign,
       category: "main",
       url: "/accounting/page/1",
+    },
+    {
+      value: "staff",
+      label: "Staff",
+      icon: UserRoundPen,
+      category: "main",
+      url: "/staff/page/1",
     },
     {
       value: "aiagents",
@@ -174,6 +196,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
       category: "main",
       url: "/ai-agents/page/1",
     },
+
     {
       value: "knowledge-base",
       label: "Knowledge Base",
@@ -194,6 +217,13 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
       icon: ShoppingBag,
       category: "projects",
       url: "/white-label-leads/page/1",
+    },
+    {
+      value: "default-agent",
+      label: "Default Agent",
+      icon: BotIcon,
+      category: "testing",
+      url: "/default-agent/page/1",
     },
     {
       value: "website-testing",
@@ -263,15 +293,21 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
           icon: Settings,
           items: [
             {
+              title: "Key Management",
+              icon: KeyIcon,
+              url: "/settings/key-management/page/1",
+            },
+            {
+              title: "Phone Settings",
+              icon: PhoneIncoming,
+              url: "/settings/phone-settings/page/1",
+            },
+            {
               title: "Page Management",
               url: "/settings/page-management",
               icon: FileCheck,
             },
-            {
-              title: "Staff",
-              url: "/settings/staff/page/1",
-              icon: UserRoundPen,
-            },
+
             {
               title: "Notifications ",
               url: "/settings/notifications",

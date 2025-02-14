@@ -25,6 +25,7 @@ import {
   Camera,
   Check,
   ChevronsUpDown,
+  DollarSign,
   LibraryBig,
   Loader2,
   PhoneIncoming,
@@ -149,7 +150,8 @@ const CreateStaff = () => {
   const TabsList = [
     { value: "workspaces", label: "Workspaces", icon: Building2 },
     { value: "vendors", label: "Vendors", icon: Users2 },
-    { value: "accounting", label: "Accounting", icon: UserPen },
+    { value: "accounting", label: "Accounting", icon: DollarSign },
+    { value: "staff", label: "Staff", icon: UserPen },
     { value: "aiagents", label: "AI Agents", icon: Bot },
     {
       value: "ticket-management",
@@ -167,8 +169,8 @@ const CreateStaff = () => {
       icon: ShoppingBag,
     },
     { value: "settings", label: "Settings", icon: Settings },
+    { value: "default-agent", label: "Default Agent", icon: Bot },
     { value: "call-testing", label: "Call Testing", icon: PhoneIncoming },
-    { value: "website-testing", label: "Website Testing", icon: TestTube2 },
   ];
 
   const params = useParams();
@@ -245,7 +247,7 @@ const CreateStaff = () => {
       await henceforthApi.SuperAdmin.editStaff(String(params?._id), payload);
 
       Toast.success("Staff edited successfully.");
-      router.push("/settings/staff/page/1");
+      router.push("/staff/page/1");
     } catch (error: any) {
       Toast.error(error || "An unexpected error occurred");
     }

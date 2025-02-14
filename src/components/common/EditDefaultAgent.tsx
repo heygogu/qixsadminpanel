@@ -26,10 +26,7 @@ import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useState } from "react";
-// import DashboardLayout from "@/app/dashboard/layout";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-// import placeholder from "@/assets/images/userplaceholder.png";
-// import PageContainer from "@/components/layout/page-container";
 import { useRouter } from "next/navigation";
 import {
   Brain,
@@ -40,25 +37,23 @@ import {
   Phone,
   User,
 } from "lucide-react";
-// import Toast from "react-hot-Toast";
+import toast from "react-hot-toast";
 import henceforthApi from "@/utils/henceforthApis";
+import { useParams } from "next/navigation";
 import { MultiSelect } from "@/components/common/MultiSelect";
-import { useGlobalContext } from "@/app/providers/Provider";
-import { Separator } from "../ui/separator";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
-  // image: z.string().url("Please enter a valid URL").optional(),
   voice: z.string().optional(),
   twilio_config: z.string().optional(),
   model: z.string(),
   knowledgeBase: z.array(z.string()).optional(),
-  idleReminder: z.boolean(),
-  callDuration: z.number().min(1).max(120),
-  allowCallCut: z.boolean(),
-  callTransfer: z.boolean(),
+  idleReminder: z.boolean().optional(),
+  callDuration: z.number().min(0).max(120).optional(),
+  allowCallCut: z.boolean().optional(),
+  callTransfer: z.boolean().optional(),
   sendMessage: z.boolean(),
-  realTimeBooking: z.boolean(),
+  realTimeBooking: z.boolean().optional(),
   chat_prompt: z.string().min(10, "Prompt must be at least 10 characters"),
   chat_firstMessage: z
     .string()
@@ -69,31 +64,94 @@ const formSchema = z.object({
     .min(10, "First message must be at least 10 characters"),
 });
 
-function AddTemplate() {
+function EditDefaultAgent() {
+  const params = useParams();
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [isImageLoading, setIsImageLoading] = useState(false);
+  const [photoString, setPhotoString] = useState<string | null>(null);
+  const [knowledgeBaseOptions, setKnowledgeBaseOptions] = useState<any>([]);
+  const knowledgeBasesforSelection = knowledgeBaseOptions?.map(
+    (option: any) => ({
+      value: option?._id,
+      label: option?.name,
+      icon: LibraryBig,
+    })
+  );
+
+  const [defaultKnowledgeBase, setDefaultKnowledgeBase] = useState<any>([]);
+  console.log(defaultKnowledgeBase, "defaultKnowledgeBase");
+  const [phoneNumberListing, setPhoneNumberListing] = useState<any>([]);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      idleReminder: true,
-      callDuration: 30,
-      allowCallCut: true,
-      callTransfer: true,
-      sendMessage: true,
-      realTimeBooking: true,
-      voice: "aura-zeus-en",
       model: "gemini",
+      knowledgeBase: knowledgeBaseOptions,
     },
   });
-  const router = useRouter();
 
-  const [logoFile, setLogoFile] = useState<File | null>(null);
-  const { userInfo, Toast } = useGlobalContext();
-  const [logoPreview, setLogoPreview] = useState<string | null>(null);
-  const [isImageLoading, setIsImageLoading] = useState(false);
-  const [photoString, setPhotoString] = useState<string | null>(
-    userInfo?.workspace?.image
-  );
-  const [knowledgeBaseOptions, setKnowledgeBaseOptions] = useState<any>([]);
-  const [phoneNumberListing, setPhoneNumberListing] = useState<any>([]);
+  useEffect(() => {
+    const fetchAgentData = async () => {
+      try {
+        const apiRes = await henceforthApi.SuperAdmin.getAgentTemplateDetails(
+          params?._id as string
+        );
+        setDefaultKnowledgeBase(
+          apiRes?.data?.knowledge_base_id?.map((option: any) => option?._id)
+        );
+        debugger;
+        if (apiRes?.data) {
+          form.reset({
+            name: apiRes?.data?.name,
+            voice: apiRes?.data?.voice ?? "",
+            twilio_config: apiRes?.data?.twilio_config?._id ?? "",
+            model: apiRes?.data?.ai_model,
+            knowledgeBase: defaultKnowledgeBase,
+            idleReminder: apiRes?.data?.idle_reminder,
+            callDuration: apiRes?.data?.call_limit_duration ?? 0,
+            allowCallCut: apiRes?.data?.call_cut_ability,
+            callTransfer: apiRes?.data?.call_transfer,
+            sendMessage: apiRes?.data?.send_message,
+            realTimeBooking: apiRes?.data?.real_time_booking,
+            chat_prompt: apiRes?.data?.chat_prompt,
+            chat_firstMessage: apiRes?.data?.chat_first_message,
+            call_prompt: apiRes?.data?.call_prompt,
+            call_firstMessage: apiRes?.data?.call_first_message,
+          });
+          setLogoPreview(apiRes?.data?.image);
+          setPhotoString(apiRes?.data?.image);
+        }
+      } catch (error) {
+        toast.error("Failed to fetch agent data");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const getKnowledgeBaseOptions = async () => {
+      try {
+        const apiRes = await henceforthApi.SuperAdmin.getKnowledgeBases();
+        setKnowledgeBaseOptions(apiRes?.data);
+      } catch (error) {
+        toast.error("Failed to fetch knowledge bases");
+      }
+    };
+    const getPhoneNumbers = async () => {
+      try {
+        const apiRes = await henceforthApi.SuperAdmin.getPhoneNumbers();
+        setPhoneNumberListing(apiRes);
+      } catch (error) {
+        setPhoneNumberListing([]);
+      }
+    };
+    getPhoneNumbers();
+
+    fetchAgentData();
+    getKnowledgeBaseOptions();
+  }, [params?._id, form]);
 
   const handleLogoUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -104,12 +162,12 @@ function AddTemplate() {
       const maxSize = 5 * 1024 * 1024; // 5MB
 
       if (!validTypes.includes(file.type)) {
-        Toast.error("Invalid file type. Please upload JPEG, PNG, or WebP.");
+        toast.error("Invalid file type. Please upload JPEG, PNG, or WebP.");
         return;
       }
 
       if (file.size > maxSize) {
-        Toast.error("File is too large. Maximum size is 5MB.");
+        toast.error("File is too large. Maximum size is 5MB.");
         return;
       }
 
@@ -128,23 +186,15 @@ function AddTemplate() {
         const apiRes = await henceforthApi.SuperAdmin.imageUpload(formData);
         setPhotoString(apiRes?.file_name);
       } catch (error) {
-        Toast.error("Failed to upload image");
+        toast.error("Failed to upload image");
       } finally {
         setIsImageLoading(false);
       }
     }
   };
 
-  const knowledgeBasesforSelection = knowledgeBaseOptions?.map(
-    (option: any) => ({
-      value: option?._id,
-      label: option?.name,
-      icon: LibraryBig,
-    })
-  );
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values, "formvalues");
-
+    debugger;
     const payload = {
       name: values.name,
       type: "Agent",
@@ -156,7 +206,7 @@ function AddTemplate() {
       call_prompt: values.call_prompt,
       twilio_config: values.twilio_config,
       country_code: "+91",
-      knowledge_base_id: values.knowledgeBase,
+      knowledge_base_id: defaultKnowledgeBase,
       ai_model: values.model,
       idle_reminder: values.idleReminder,
       call_cut_ability: values.allowCallCut,
@@ -167,44 +217,44 @@ function AddTemplate() {
     };
 
     try {
-      const apiRes = await henceforthApi.SuperAdmin.addAgentTemplate(payload);
-      Toast.success("Agent created successfully");
-      router.push("/ai-agents/page/1");
+      await henceforthApi.SuperAdmin.updateAgentTemplate(
+        params?._id as string,
+        payload
+      );
+      toast.success("Agent updated successfully");
+      // router.push("/aiagents/page/1");
+
+      const path = "/default-agent/page/1";
+
+      const link = document.createElement("a");
+      link.href = path;
+      link.setAttribute("data-next-link", "");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } catch (error) {
-      Toast.error(error);
-    } finally {
+      toast.error("Failed to update agent");
     }
   }
 
-  useEffect(() => {
-    const getKnowledgeBaseOptions = async () => {
-      try {
-        const apiRes = await henceforthApi.SuperAdmin.getKnowledgeBases();
-        console.log(apiRes?.data, "apiRes?.data");
-        setKnowledgeBaseOptions(apiRes?.data);
-      } catch (error) {}
-    };
-    const getPhoneNumbers = async () => {
-      try {
-        const apiRes = await henceforthApi.SuperAdmin.getPhoneNumbers();
-        console.log(apiRes?.data, "apiRes?.data");
-        setPhoneNumberListing(apiRes);
-      } catch (error) {}
-    };
-    getPhoneNumbers();
-    getKnowledgeBaseOptions();
-  }, []);
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="mb-6">
-        <h2 className="text-2xl font-bold tracking-tight mb-2">Create Agent</h2>
+        <h2 className="text-2xl font-bold tracking-tight ">Edit Agent</h2>
         <p className="text-muted-foreground">
-          Build a custom AI agent with complete control over its capabilities,
-          personality, and behavior
+          Modify your AI agent's capabilities, personality, and behavior
         </p>
       </div>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 ">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card className="pb-3">
               <CardHeader>
@@ -221,11 +271,11 @@ function AddTemplate() {
                   />
                   <div className="relative group">
                     <Avatar className="h-24 w-24 border-2 border-gray-200">
-                      {logoPreview ? (
+                      {photoString ? (
                         <AvatarImage
-                          src={logoPreview}
+                          src={henceforthApi.FILES.imageOriginal(photoString)}
                           alt="Agent Image"
-                          className="object-cover h-full w-full"
+                          className="object-cover"
                         />
                       ) : (
                         <AvatarFallback className="text-2xl bg-gray-100">
@@ -269,20 +319,6 @@ function AddTemplate() {
                     </FormItem>
                   )}
                 />
-
-                {/* <FormField
-                                    control={form.control}
-                                    name="image"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Agent Image URL</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="Enter image URL" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                /> */}
 
                 <div className="grid grid-cols-1 gap-6">
                   <FormField
@@ -375,25 +411,11 @@ function AddTemplate() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Knowledge Base</FormLabel>
-                        {/* <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                    <FormControl>
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder="Select knowledge base" />
-                                                        </SelectTrigger>
-                                                    </FormControl>
-                                                    <SelectContent className="bg-white">
-                                                        {/* <SelectItem value="general">General Knowledge</SelectItem>
-                                                        <SelectItem value="customer">Customer Service</SelectItem>
-                                                        <SelectItem value="technical">Technical Support</SelectItem> */}
-                        {/* {knowledgeBaseOptions?.length>0? knowledgeBaseOptions?.map((option:any)=>(
-                                                            <SelectItem key={option?._id} value={option?._id}>{option?.name}</SelectItem>
-                                                        )): <SelectItem value="nodata" disabled>No knowledge base available</SelectItem>}
-                                                    </SelectContent> 
-                                                </Select> */}
+
                         <MultiSelect
                           options={knowledgeBasesforSelection}
-                          onValueChange={field.onChange}
-                          defaultValue={field.value || []}
+                          onValueChange={setDefaultKnowledgeBase}
+                          defaultValue={defaultKnowledgeBase}
                           placeholder="Select Knowledge Bases"
                           variant="inverted"
                           animation={2}
@@ -447,9 +469,9 @@ function AddTemplate() {
                   )}
                 />
               </CardContent>
-              <Separator className="  text-gray-500" />
+              <hr className="text-gray-400"></hr>
               <CardHeader>
-                <CardTitle className="">Call Configuration</CardTitle>
+                <CardTitle>Call Configuration</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <FormField
@@ -460,7 +482,7 @@ function AddTemplate() {
                       <FormLabel>First Message</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Enter the first message the agent will say..."
+                          placeholder="Enter the first message the agent will send..."
                           className="min-h-[100px]"
                           {...field}
                         />
@@ -488,9 +510,6 @@ function AddTemplate() {
                 />
               </CardContent>
             </Card>
-            {/* <Card>
-                            <CardHeader>Call Prompt Configuration</CardHeader>
-                        </Card> */}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -510,25 +529,17 @@ function AddTemplate() {
                           <Select
                             value={field.value}
                             onValueChange={field.onChange}
+                            defaultValue=""
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Select Phone Number" />
                             </SelectTrigger>
                             <SelectContent className="bg-white">
-                              {phoneNumberListing?.length > 0 ? (
-                                phoneNumberListing?.map((option: any) => (
-                                  <SelectItem
-                                    key={option?._id}
-                                    value={option?._id}
-                                  >
-                                    {option?.phone_number}
-                                  </SelectItem>
-                                ))
-                              ) : (
-                                <SelectItem value="nodata" disabled>
-                                  No phone number available
+                              {phoneNumberListing?.map((option: any) => (
+                                <SelectItem value={option?._id}>
+                                  {option?.phone_number}
                                 </SelectItem>
-                              )}
+                              ))}
                             </SelectContent>
                           </Select>
                         </FormControl>
@@ -586,7 +597,7 @@ function AddTemplate() {
                   control={form.control}
                   name="callDuration"
                   render={({ field }) => (
-                    <FormItem className=" rounded-lg border p-4">
+                    <FormItem className="rounded-lg border p-4">
                       <div className="space-y-0.5 flex flex-col">
                         <FormLabel className="text-base">
                           Call Duration Limit
@@ -594,14 +605,13 @@ function AddTemplate() {
                         <FormDescription>
                           Limit the duration of calls
                         </FormDescription>
-                        {/* <FormLabel>Call Duration Limit (minutes)</FormLabel> */}
                       </div>
                       <FormControl>
                         <Slider
                           min={1}
                           max={120}
                           step={1}
-                          value={[field.value]}
+                          value={[field.value ?? 0]}
                           onValueChange={(value) => field.onChange(value[0])}
                         />
                       </FormControl>
@@ -697,10 +707,20 @@ function AddTemplate() {
             </Card>
           </div>
 
-          <div className="mt-6 flex justify-end p-2 gap-4 ">
-            {/* <Button variant="outline" className="text-red-400 border-red-200 bg-red-50" onClick={onCancel}>Cancel</Button> */}
+          <div className="mt-6 flex justify-end p-2 gap-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.push("/ai-agents/page/1")}
+            >
+              Cancel
+            </Button>
             <Button className="bg-primary text-white mb-5" type="submit">
-              Create Agent
+              {form.formState.isSubmitting ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                "Save Changes"
+              )}
             </Button>
           </div>
         </form>
@@ -709,4 +729,4 @@ function AddTemplate() {
   );
 }
 
-export default AddTemplate;
+export default EditDefaultAgent;

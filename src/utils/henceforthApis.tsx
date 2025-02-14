@@ -81,6 +81,9 @@ const SuperAdmin = {
   profile: () => requests.get(`admin/profile`),
   updateProfile: (info: any) => requests.put("admin/profile", info),
   updatePassword: (info: any) => requests.put("admin/password", info),
+  createWorkspace: (info: any) => requests.post("admin/workspace/create", info),
+  generateSecretKey: (info?: any) => requests.get("admin/secret/gen-key"),
+  getMyWorkspaces: (q?: any) => requests.get("admin/my-workspace"),
 
   //for agent listing
   getPhoneNumbers: (q?: any) => requests.get(`admin/twilio/numbers`),
@@ -129,6 +132,40 @@ const SuperAdmin = {
   deleteAgentTemplate: (id: string) =>
     requests.deleteOne(`admin/ai-agent/${id}`),
 
+  //default test agent
+
+  defaultAgentListing: (q: any) =>
+    requests.get(`admin/ai-agent/default/list${q ? `?${q}` : ""}`),
+  addDefaultAgent: (info: any) => requests.post("admin/default-agent", info),
+  getDefaultAgentDetails: (id: string) =>
+    requests.get(`admin/default-agent/${id}`),
+  updateDefaultAgent: (id: string, info: any) =>
+    requests.put(`admin/default-agent/${id}`, info),
+  deleteDefaultAgent: (id: string) =>
+    requests.deleteOne(`admin/default-agent/${id}`),
+  agentPieChartData: (id: any) => requests.get(`admin/ai-agent/${id}/charts`),
+  updateAgentStatus: (id: string, info: any) =>
+    requests.put(`admin/agent/${id}/status/${info.status}`, info),
+  getAgent: (id: any) => requests.get(`agent/${id}`),
+  agentChatLogs: (id: string, info: any) =>
+    requests.get(`admin/ai-agent/${id}/logs?type=CHAT&${info}`),
+  agentCallLogs: (id: string, info: any) =>
+    requests.get(`admin/ai-agent/${id}/logs?type=CALL&${info}`),
+  agentVoiceChatLogs: (id: string, info: any) =>
+    requests.get(`admin/ai-agent/${id}/logs?type=VOICE_CHAT&${info}`),
+
+  //default agent scripts
+  generateScript: (id: any, info: any) =>
+    requests.post(`admin/ai-agent/${id}/script`, info),
+  updateScript: (id: any, info: any) =>
+    requests.put(`admin/ai-agent/${id}/script`, info),
+  // getGeneratedScript: (id: any) => requests.get(`admin/ai-agent/${id}/script`),
+  // deleteScript: (workspace_id: any, script_id: any) =>
+  //   requests.deleteOne(`admin/workspace/${workspace_id}/script/${script_id}`),
+
+  deactivateScript: (agent_id: any, script_id: any, info: any) =>
+    requests.patch(`admin/ai-agent/${agent_id}/script/${script_id}`, info),
+
   //website-testing
   websiteTesting: (info: any) => requests.put("agent/default/web", info),
   websiteTestingListing: (q?: any) =>
@@ -138,8 +175,19 @@ const SuperAdmin = {
   defaultCallData: () => requests.get(`twilio/default-call-data`),
   callTesting: (info: any) => requests.post("twilio/send-call-admin", info),
 
+  //twilio
+
+  addTwilioNumber: (info: any) => requests.post(`admin/twilio/account`, info),
+  getTwilioNumbers: (q?: any) => requests.get(`admin/twilio/account${q}`),
+  deleteTwilioNumber: (id: string) =>
+    requests.deleteOne(`admin/twilio/account/${id}`),
+
   //keylisitng
-  keyListing: (id: any) => requests.get(`vendor/workspace/${id}/key`),
+  keyListing: (id: any) => requests.get(`admin/workspace/${id}/key`),
+
+  generateKey: (id: any) => requests.post(`admin/workspace/${id}/key`, {}),
+  getGeneratedKey: (id: any) => requests.get(`admin/workspace/${id}/key`),
+  deleteKey: (id: any) => requests.deleteOne(`admin/workspace/${id}/key`),
 
   //whitelist data
   whiteLabelListing: (q?: any) =>
