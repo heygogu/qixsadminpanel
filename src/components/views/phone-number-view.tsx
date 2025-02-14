@@ -118,7 +118,7 @@ export function PhoneNumberView() {
   const searchParams = useSearchParams();
   const handleDelete = async (id: string) => {
     try {
-      await henceforthApi.SuperAdmin.getTwilioNumbers();
+      await henceforthApi.SuperAdmin.deleteTwilioNumber(id);
       Toast.success("Phone number deleted successfully");
       await getPhoneNumberListing();
     } catch (error) {
@@ -142,7 +142,7 @@ export function PhoneNumberView() {
 
       urlSearchParam.set("limit", "10");
 
-      const apiRes = await henceforthApi.SuperAdmin.getPhoneNumbers(
+      const apiRes = await henceforthApi.SuperAdmin.getTwilioNumbers(
         urlSearchParam.toString()
       );
       console.log(apiRes);
