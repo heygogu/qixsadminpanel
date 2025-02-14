@@ -14,15 +14,25 @@ import {
   Copy,
   EyeIcon,
   Info,
-  PencilIcon,
-  Trash2,
+  Plus,
   User,
-  UserPlus,
 } from "lucide-react";
 import { DataTable } from "@/components/common/data-table";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import PaginationCompo from "@/components/common/Pagination";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useGlobalContext } from "@/app/providers/Provider";
 import {
   Card,
@@ -31,46 +41,37 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { text } from "@/utils/ScriptString";
 import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
+import dayjs from "dayjs";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { AnimatePresence, motion } from "framer-motion";
 import { Textarea } from "@/components/ui/textarea";
-import { text } from "@/utils/ScriptString";
+import { Input } from "@/components/ui/input";
 
 function AgentsPage() {
+  const [createModalOpen, setCreateModalOpen] = useState(false);
   const params = useParams();
   const searchParams = useSearchParams();
-  const { Toast } = useGlobalContext();
+  const { Toast, userInfo } = useGlobalContext();
+  const [isScriptModalOpen, setIsScriptModalOpen] = useState(false);
+  const [selectedScript, setSelectedScript] = useState<any>("");
+  // const [agentListing, setAgentListing] = useState<any>([]);
+  const [isScriptExpanded, setIsScriptExpanded] = useState(false);
+  const openScriptModal = (token: string) => {
+    setSelectedScript(token);
+    setIsScriptModalOpen(true);
+    setIsScriptExpanded(false);
+  };
+
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [aiAgents, setAiAgents] = useState({
     data: [],
     count: 0,
   });
-  const [isScriptModalOpen, setIsScriptModalOpen] = useState(false);
-  const [isScriptExpanded, setIsScriptExpanded] = useState(false);
-  const [selectedScript, setSelectedScript] = useState("");
 
-  const openScriptModal = (token: string) => {
-    setSelectedScript(token);
-    setIsScriptModalOpen(true);
-    setIsScriptExpanded(false);
-  };
   const getAgentsListing = async () => {
     setLoading(true);
     try {
@@ -90,7 +91,7 @@ function AgentsPage() {
       } else {
         urlSearchParam.set("limit", String(10));
       }
-      const apiRes = await henceforthApi.SuperAdmin.agentTemplateListing(
+      const apiRes = await henceforthApi.SuperAdmin.defaultAgentListing(
         urlSearchParam.toString()
       );
       console.log(apiRes?.data, "apiRes?.data");
@@ -102,16 +103,6 @@ function AgentsPage() {
       console.error("Failed to fetch agents listing:", error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    try {
-      await henceforthApi.SuperAdmin.deleteAgentTemplate(id);
-      Toast.success("Agent deleted successfully");
-      getAgentsListing();
-    } catch (error) {
-      Toast.error("Failed to delete agent");
     }
   };
 
@@ -169,10 +160,10 @@ function AgentsPage() {
       },
     },
     {
-      accessorKey: "type",
+      accessorKey: "default_type",
       header: "Type",
       cell: ({ row }: { row: any }) => {
-        return <span>{row.getValue("type")}</span>;
+        return <span>{row.getValue("default_type")}</span>;
       },
     },
     {
@@ -386,27 +377,11 @@ function AgentsPage() {
       id: "actions",
       cell: ({ row }: { row: any }) => {
         return (
-          <div className="space-x-2">
-            <Link href={`/ai-agents/${row.original?._id}/view`} passHref>
-              <Button variant="outline">
-                <EyeIcon className="text-gray-600 h-5 w-5" />
-              </Button>
-            </Link>
-            {/* <Link
-              href={`/ai-agents/edit/agent-template/${row.original?._id}`}
-              passHref
-            >
-              <Button variant="outline">
-                <PencilIcon className=" text-gray-600 h-5 w-5 " />
-              </Button>
-            </Link> */}
-            <Button
-              variant={"outline"}
-              onClick={() => handleDelete(row.original?._id)}
-            >
-              <Trash2 className="text-gray-600 h-5 w-5" />
-            </Button>
-          </div>
+          <Link
+            href={`/default-agent/${row.original?._id}/view?callPage=1&chatPage=1&voiceChatPage=1`}
+          >
+            <EyeIcon className="mr-2 text-gray-600 h-4 w-4 " />
+          </Link>
         );
         // const agent = row.original;
         // return (
@@ -438,7 +413,7 @@ function AgentsPage() {
 
   const handlePageChange = (page: number) => {
     const query = new URLSearchParams(searchParams?.toString());
-    router.replace(`/ai-agents/page/${page}?${query.toString()}`, {
+    router.replace(`/default-agent/page/${page}?${query.toString()}`, {
       scroll: false,
     });
   };
@@ -468,29 +443,24 @@ function AgentsPage() {
 
   return (
     <PageContainer>
-      <div
-        className={cn(
-          "animate-in fade-in-50 grid grid-cols-1 duration-500 ",
-          "slide-in-from-bottom-5"
-        )}
-      >
+      <div className="grid grid-cols-12 min-w-full">
         <Card className="transition-all duration-300 col-span-12">
           <CardHeader>
             <div className="flex justify-between items-center">
               <div>
                 <div className="flex items-center gap-2">
-                  <Bot className="h-7 w-7" />
-                  <CardTitle className="text-2xl">AI Agents</CardTitle>
+                  <Bot className="h-7 w-7 text-primary" />
+                  <CardTitle className="text-2xl">Default Agents</CardTitle>
                 </div>
                 <CardDescription>
-                  Manage and monitor your AI agent
+                  Manage and monitor your default AI agents
                 </CardDescription>
               </div>
-              <Link href="/ai-agents/create/agent-template" passHref>
+              {/* <Link href={"/default-agent/create-new"}>
                 <Button className="bg-primary text-white ">
-                  <UserPlus className=" h-4 w-4" /> Create Agent
+                  <Plus className=" h-4 w-4" /> Create New Agent
                 </Button>
-              </Link>
+              </Link> */}
             </div>
           </CardHeader>
 
@@ -522,6 +492,10 @@ function AgentsPage() {
             </div>
           </CardContent>
         </Card>
+        {/* <CreateAgentModal
+          open={createModalOpen}
+          onOpenChange={setCreateModalOpen}
+        /> */}
       </div>
 
       <Dialog open={isScriptModalOpen} onOpenChange={setIsScriptModalOpen}>

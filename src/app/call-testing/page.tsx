@@ -110,22 +110,6 @@ const PhoneNumberSubmission = () => {
   );
   const [defaultKnowledgeBase, setDefaultKnowledgeBase] = useState<any>([]);
 
-  const [secretKey, setSecretKey] = useState<string | null>(null);
-  const getKeyListing = async () => {
-    // setIsLoading(true)
-    let apiRes;
-    try {
-      apiRes = await henceforthApi.SuperAdmin.keyListing(
-        userInfo?.workspace?.workspace_id?._id
-      );
-      setSecretKey(apiRes?.data[0]?.key);
-    } catch (error) {
-    } finally {
-      // setIsLoading(false);
-    }
-    return apiRes;
-  };
-
   useEffect(() => {
     const getKnowledgeBaseOptions = async () => {
       try {
@@ -134,7 +118,7 @@ const PhoneNumberSubmission = () => {
         setKnowledgeBaseOptions(apiRes?.data);
       } catch (error) {}
     };
-    getKeyListing();
+
     getKnowledgeBaseOptions();
   }, []);
 
@@ -172,7 +156,7 @@ const PhoneNumberSubmission = () => {
       const payload = {
         phone_no: `${values.countryCode + values.phoneNumber}`,
         knowledge_base_id: defaultKnowledgeBase,
-        secret_key: secretKey,
+        secret_key: userInfo?.workspace?.key,
         voice: values.voice,
         prompt: values.systemPrompt,
         call_first_message: values.firstMessage,

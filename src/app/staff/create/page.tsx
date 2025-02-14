@@ -21,10 +21,12 @@ import henceforthApi from "@/utils/henceforthApis";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Bot,
+  BotIcon,
   Building2,
   Camera,
   Check,
   ChevronsUpDown,
+  DollarSign,
   LibraryBig,
   Loader2,
   PhoneIncoming,
@@ -35,6 +37,7 @@ import {
   TicketCheck,
   User,
   UserPen,
+  UserRoundPen,
   Users2,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -89,8 +92,10 @@ const CreateStaff = () => {
   const TabsList = [
     { value: "workspaces", label: "Workspaces", icon: Building2 },
     { value: "vendors", label: "Vendors", icon: Users2 },
-    { value: "accounting", label: "Accounting", icon: UserPen },
+    { value: "accounting", label: "Accounting", icon: DollarSign },
+    { value: "staff", label: "Staff", icon: UserRoundPen },
     { value: "aiagents", label: "AI Agents", icon: Bot },
+
     {
       value: "ticket-management",
       label: "Ticket Management",
@@ -107,8 +112,8 @@ const CreateStaff = () => {
       icon: ShoppingBag,
     },
     { value: "settings", label: "Settings", icon: Settings },
+    { value: "default-agent", label: "Default Agent", icon: Bot },
     { value: "call-testing", label: "Call Testing", icon: PhoneIncoming },
-    { value: "website-testing", label: "Website Testing", icon: TestTube2 },
   ];
 
   const [imageState, setImageState] = useState<{
@@ -148,7 +153,7 @@ const CreateStaff = () => {
       await henceforthApi.SuperAdmin.createStaff(payload);
 
       Toast.success("Staff added successfully.");
-      router.push("/settings/staff/page/1");
+      router.push("/staff/page/1");
     } catch (error: any) {
       Toast.error(error || "An unexpected error occurred");
     }

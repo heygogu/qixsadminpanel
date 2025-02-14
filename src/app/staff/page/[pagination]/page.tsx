@@ -1,13 +1,6 @@
 "use client";
 import React, { useEffect } from "react";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { UserPlus, Pencil, Trash2, UserPen, User, Search } from "lucide-react";
@@ -24,7 +17,6 @@ import {
 import Link from "next/link";
 import henceforthApi from "@/utils/henceforthApis";
 import { useParams, useSearchParams } from "next/navigation";
-import { url } from "inspector";
 import dayjs from "dayjs";
 import { cn } from "@/lib/utils";
 import { debounce } from "lodash";
@@ -35,7 +27,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { head } from "superagent";
 import { useGlobalContext } from "@/app/providers/Provider";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
@@ -210,7 +201,7 @@ const StaffListing = () => {
       header: "Actions",
       cell: ({ row }) => (
         <div className="flex gap-2">
-          <Link href={`/settings/staff/edit/${row?.original?._id}`} passHref>
+          <Link href={`/staff/edit/${row?.original?._id}`} passHref>
             <Button variant="outline" size="sm">
               <Pencil className="w-4 h-4" />
             </Button>
@@ -267,7 +258,7 @@ const StaffListing = () => {
                 <CardDescription>Manage and monitor your staff</CardDescription>
               </div>
 
-              <Link href={`/settings/staff/create`} passHref>
+              <Link href={`/staff/create`} passHref>
                 <Button className="flex items-center gap-2">
                   <UserPlus className="w-4 h-4" />
                   Add Staff

@@ -26,7 +26,7 @@ import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useState } from "react";
-// import DashboardLayout from "@/app/dashboard/layout";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 // import placeholder from "@/assets/images/userplaceholder.png";
 // import PageContainer from "@/components/layout/page-container";
@@ -40,11 +40,11 @@ import {
   Phone,
   User,
 } from "lucide-react";
-// import Toast from "react-hot-Toast";
+import toast from "react-hot-toast";
 import henceforthApi from "@/utils/henceforthApis";
 import { MultiSelect } from "@/components/common/MultiSelect";
 import { useGlobalContext } from "@/app/providers/Provider";
-import { Separator } from "../ui/separator";
+import { Separator } from "@/components/ui/separator";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -69,7 +69,7 @@ const formSchema = z.object({
     .min(10, "First message must be at least 10 characters"),
 });
 
-function AddTemplate() {
+function CreateAgentForm({ onCancel }: { onCancel: () => void }) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -104,12 +104,12 @@ function AddTemplate() {
       const maxSize = 5 * 1024 * 1024; // 5MB
 
       if (!validTypes.includes(file.type)) {
-        Toast.error("Invalid file type. Please upload JPEG, PNG, or WebP.");
+        toast.error("Invalid file type. Please upload JPEG, PNG, or WebP.");
         return;
       }
 
       if (file.size > maxSize) {
-        Toast.error("File is too large. Maximum size is 5MB.");
+        toast.error("File is too large. Maximum size is 5MB.");
         return;
       }
 
@@ -128,7 +128,7 @@ function AddTemplate() {
         const apiRes = await henceforthApi.SuperAdmin.imageUpload(formData);
         setPhotoString(apiRes?.file_name);
       } catch (error) {
-        Toast.error("Failed to upload image");
+        toast.error("Failed to upload image");
       } finally {
         setIsImageLoading(false);
       }
@@ -155,7 +155,6 @@ function AddTemplate() {
       call_first_message: values.call_firstMessage,
       call_prompt: values.call_prompt,
       twilio_config: values.twilio_config,
-      country_code: "+91",
       knowledge_base_id: values.knowledgeBase,
       ai_model: values.model,
       idle_reminder: values.idleReminder,
@@ -167,9 +166,9 @@ function AddTemplate() {
     };
 
     try {
-      const apiRes = await henceforthApi.SuperAdmin.addAgentTemplate(payload);
+      const apiRes = await henceforthApi.SuperAdmin.addDefaultAgent(payload);
       Toast.success("Agent created successfully");
-      router.push("/ai-agents/page/1");
+      router.push("/default-agent/page/1");
     } catch (error) {
       Toast.error(error);
     } finally {
@@ -184,6 +183,7 @@ function AddTemplate() {
         setKnowledgeBaseOptions(apiRes?.data);
       } catch (error) {}
     };
+
     const getPhoneNumbers = async () => {
       try {
         const apiRes = await henceforthApi.SuperAdmin.getPhoneNumbers();
@@ -709,4 +709,4 @@ function AddTemplate() {
   );
 }
 
-export default AddTemplate;
+export default CreateAgentForm;
