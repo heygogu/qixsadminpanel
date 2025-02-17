@@ -6,10 +6,10 @@ import _superagent from "superagent";
 const SuperagentPromise = require("superagent-promise");
 const superagent = SuperagentPromise(_superagent, global.Promise);
 
-export const API_ROOT = "https://qixs.ai:3001/";
+export const API_ROOT = "https://dev.qixs.ai:3003/";
 export const BUCKET_ROOT =
   "https://demoserver3.sgp1.digitaloceanspaces.com/uploads/images";
-export const PINECONE_ROOT = "https://qixs.ai:3001/";
+export const PINECONE_ROOT = "https://dev.qixs.ai:3003/";
 
 const API_FILE_ROOT_MEDIUM = `${BUCKET_ROOT}/medium/`;
 const API_FILE_ROOT_ORIGINAL = `${BUCKET_ROOT}/original/`;
@@ -178,7 +178,7 @@ const SuperAdmin = {
   //twilio
 
   addTwilioNumber: (info: any) => requests.post(`admin/twilio/account`, info),
-  getTwilioNumbers: (q?: any) => requests.get(`admin/twilio/account${q}`),
+  getTwilioNumbers: (q?: any) => requests.get(`admin/twilio/account?${q}`),
   deleteTwilioNumber: (id: string) =>
     requests.deleteOne(`admin/twilio/account/${id}`),
 
