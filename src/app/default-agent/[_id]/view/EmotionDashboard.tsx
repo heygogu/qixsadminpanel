@@ -99,9 +99,6 @@ const EmotionDashboard = React.memo(
         const token = Buffer.from(
           JSON.stringify({
             agent_id: agentId,
-            secret_key: scriptData?.key,
-
-            workspace_id: userInfo?.workspace?._id,
           })
         )
           .toString("base64")
