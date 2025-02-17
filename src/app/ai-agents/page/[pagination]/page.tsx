@@ -51,6 +51,7 @@ import { Input } from "@/components/ui/input";
 import { AnimatePresence, motion } from "framer-motion";
 import { Textarea } from "@/components/ui/textarea";
 import { text } from "@/utils/ScriptString";
+import CodeBlockDemo from "@/components/common/CodeBlock";
 
 function AgentsPage() {
   const params = useParams();
@@ -531,12 +532,12 @@ function AgentsPage() {
           </DialogHeader>
           <div className="mt-4">
             <div className="flex flex-col gap-2 mb-4">
-              <Label>CDN Link</Label>
+              <Label>CDN Links</Label>
               <p className="text-sm text-gray-600">
-                Embed this in the body of your project's HTML:
+                Embed these in the body/head of your project's HTML:
               </p>
               <div className="flex items-center w-full">
-                <Input
+                {/* <Input
                   className="flex-1"
                   value={`<script src="${process.env.NEXT_PUBLIC_DEV_BOT_CDN_LINK}?token=${selectedScript}"></script>`}
                   readOnly
@@ -551,7 +552,10 @@ function AgentsPage() {
                   }}
                 >
                   <Copy className="w-4 h-4" />
-                </Button>
+                </Button> */}
+                <CodeBlockDemo
+                  code={`<script src="https://cdn.jsdelivr.net/npm/@deepgram/sdk"></script><script src="${process.env.NEXT_PUBLIC_DEV_BOT_CDN_LINK}?token=${selectedScript}"></script>`}
+                />
               </div>
             </div>
             <div className=" max-w-3xl mt-5 flex flex-col gap-2 overflow-y-auto">
