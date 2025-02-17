@@ -604,7 +604,7 @@ const AgentDashboard = () => {
                           whileTap={{ scale: 0.98 }}
                         >
                           <Link
-                            href={`${process.env.NEXT_PUBLIC_DEV_CHAT_LINK}/form?token=${token}`}
+                            href={`${process.env.NEXT_PUBLIC_PROD_CHAT_LINK}/form?token=${token}`}
                             className="flex items-center justify-center space-x-2 bg-white/50 backdrop-blur-sm p-3 rounded-lg hover:bg-white/60 transition-all"
                             target="_blank"
                           >
@@ -656,14 +656,14 @@ const AgentDashboard = () => {
                               <div className="flex items-center w-full">
                                 <Input
                                   className="flex-1"
-                                  value={`<script src="${process.env.NEXT_PUBLIC_DEV_BOT_CDN_LINK}?token=${token}"></script>`}
+                                  value={`<script src="${process.env.NEXT_PUBLIC_PROD_BOT_CDN_LINK}?token=${token}"></script>`}
                                   readOnly
                                 />
                                 <Button
                                   className="ml-2"
                                   onClick={() => {
                                     navigator.clipboard.writeText(
-                                      `<script src="${process.env.NEXT_PUBLIC_DEV_BOT_CDN_LINK}?token=${token}"></script>`
+                                      `<script src="${process.env.NEXT_PUBLIC_PROD_BOT_CDN_LINK}?token=${token}"></script>`
                                     );
                                     Toast.success("Chatbot script copied");
                                   }}

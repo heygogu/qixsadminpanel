@@ -255,7 +255,7 @@ function AgentsPage() {
         return (
           <div className="font-medium">
             <Link
-              href={`${process.env.NEXT_PUBLIC_DEV_CHAT_LINK}/form?token=${token}`}
+              href={`${process.env.NEXT_PUBLIC_PROD_CHAT_LINK}/form?token=${token}`}
               target="_blank"
               className={`${
                 row.original?.script_status === "IN_ACTIVE"
@@ -512,14 +512,14 @@ function AgentsPage() {
               <div className="flex items-center w-full">
                 <Input
                   className="flex-1"
-                  value={`<script src="${process.env.NEXT_PUBLIC_DEV_BOT_CDN_LINK}?token=${selectedScript}"></script>`}
+                  value={`<script src="${process.env.NEXT_PUBLIC_PROD_BOT_CDN_LINK}?token=${selectedScript}"></script>`}
                   readOnly
                 />
                 <Button
                   className="ml-2"
                   onClick={() => {
                     navigator.clipboard.writeText(
-                      `<script src="${process.env.NEXT_PUBLIC_DEV_BOT_CDN_LINK}?token=${selectedScript}"></script>`
+                      `<script src="${process.env.NEXT_PUBLIC_PROD_BOT_CDN_LINK}?token=${selectedScript}"></script>`
                     );
                     Toast.success("Chatbot script copied");
                   }}
