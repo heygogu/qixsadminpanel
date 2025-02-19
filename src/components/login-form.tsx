@@ -33,7 +33,7 @@ export function LoginForm({
   const { getProfile, Toast } = useGlobalContext();
   const router = useRouter();
   const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("qwerty");
+  const [password, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
 

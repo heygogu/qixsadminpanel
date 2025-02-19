@@ -84,6 +84,11 @@ const SuperAdmin = {
   createWorkspace: (info: any) => requests.post("admin/workspace/create", info),
   generateSecretKey: (info?: any) => requests.get("admin/secret/gen-key"),
   getMyWorkspaces: (q?: any) => requests.get("admin/my-workspace"),
+  getCallAgentData: (q?: any) => requests.get("admin/ai-agent/test"),
+
+  //accounting
+  getAccountingData: (q?: any) =>
+    requests.get(`admin/accounting${q ? `?${q}` : ""}`),
 
   //for agent listing
   getPhoneNumbers: (q?: any) => requests.get(`admin/twilio/numbers`),

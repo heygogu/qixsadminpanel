@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import {
   Card,
   CardContent,
@@ -31,6 +31,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   ImageIcon,
+  User,
 } from "lucide-react";
 import PageContainer from "@/components/layouts/page-container";
 import DashboardLayout from "@/components/layouts/dashboard-layout";
@@ -43,113 +44,285 @@ import {
   FaMoneyBillWave,
   FaRupeeSign,
 } from "react-icons/fa6";
+import { count } from "console";
+import henceforthApi from "@/utils/henceforthApis";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
+import PaginationCompo from "@/components/common/Pagination";
+import { Badge } from "@/components/ui/badge";
+import dayjs from "dayjs";
 
 // Mock data for accounting entries
-const accountingData = [
-  {
-    id: 1,
-    orderNumber: "ORD-2024-001",
-    workspaceName: "Design Studio Pro",
-    workspaceImage: "/api/placeholder/32/32",
-    date: "2024-01-10",
-    amount: 499.99,
-    expense: 150.0,
-    earning: 349.99,
-  },
-  {
-    id: 2,
-    orderNumber: "ORD-2024-002",
-    workspaceName: "Tech Hub Plus",
-    workspaceImage: "/api/placeholder/32/32",
-    date: "2024-01-11",
-    amount: 299.99,
-    expense: 89.99,
-    earning: 210.0,
-  },
-];
 
 // Summary metrics for the dashboard
-const summaryMetrics = {
-  totalEarnings: 559.99,
-  totalExpenses: 239.99,
-  totalRevenue: 799.98,
-  growthRate: 12.5,
-};
 
 // Column definitions
-const accountingColumns = [
-  {
-    accessorKey: "orderNumber",
-    header: "Order Number",
-    cell: ({ row }) => (
-      <span className="font-medium">{row.original.orderNumber}</span>
-    ),
-  },
-  {
-    accessorKey: "workspaceName",
-    header: "Workspace",
-    cell: ({ row }) => (
-      <div className="flex items-center gap-2">
-        <Avatar className="h-8 w-8">
-          <AvatarImage
-            src={row.original.workspaceImage}
-            alt={row.original.workspaceName}
-          />
-          <AvatarFallback>
-            <ImageIcon className="h-4 w-4" />
-          </AvatarFallback>
-        </Avatar>
-        <span>{row.original.workspaceName}</span>
-      </div>
-    ),
-  },
-  {
-    accessorKey: "date",
-    header: "Date",
-    cell: ({ row }) => (
-      <div className="flex items-center gap-2">
-        <Calendar className="h-4 w-4 text-gray-500" />
-        {new Date(row.original.date).toLocaleDateString()}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "amount",
-    header: "Amount",
-    cell: ({ row }) => (
-      <div className="font-medium">₹{row.original.amount.toFixed(2)}</div>
-    ),
-  },
-  {
-    accessorKey: "expense",
-    header: "Expense",
-    cell: ({ row }) => (
-      <div className="flex items-center gap-1 text-red-500">
-        <ArrowDownRight className="h-4 w-4" />₹{row.original.expense.toFixed(2)}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "earning",
-    header: "Earning",
-    cell: ({ row }) => (
-      <div className="flex items-center gap-1 text-green-500">
-        <ArrowUpRight className="h-4 w-4" />₹{row.original.earning.toFixed(2)}
-      </div>
-    ),
-  },
-  {
-    id: "actions",
-    header: "Actions",
-    cell: ({ row }) => (
-      <Button variant="ghost" size="icon">
-        <Eye className="h-4 w-4" />
-      </Button>
-    ),
-  },
-];
+// const accountingColumns = [
+//   {
+//     accessorKey: "orderNumber",
+//     header: "Order Number",
+//     cell: ({ row }) => (
+//       <span className="font-medium">{row.original.orderNumber}</span>
+//     ),
+//   },
+//   {
+//     accessorKey: "workspaceName",
+//     header: "Workspace",
+//     cell: ({ row }) => (
+//       <div className="flex items-center gap-2">
+//         <Avatar className="h-8 w-8">
+//           <AvatarImage
+//             src={row.original.workspaceImage}
+//             alt={row.original.workspaceName}
+//           />
+//           <AvatarFallback>
+//             <ImageIcon className="h-4 w-4" />
+//           </AvatarFallback>
+//         </Avatar>
+//         <span>{row.original.workspaceName}</span>
+//       </div>
+//     ),
+//   },
+//   {
+//     accessorKey: "date",
+//     header: "Date",
+//     cell: ({ row }) => (
+//       <div className="flex items-center gap-2">
+//         <Calendar className="h-4 w-4 text-gray-500" />
+//         {new Date(row.original.date).toLocaleDateString()}
+//       </div>
+//     ),
+//   },
+//   {
+//     accessorKey: "amount",
+//     header: "Amount",
+//     cell: ({ row }) => (
+//       <div className="font-medium">₹{row.original.amount.toFixed(2)}</div>
+//     ),
+//   },
+//   {
+//     accessorKey: "expense",
+//     header: "Expense",
+//     cell: ({ row }) => (
+//       <div className="flex items-center gap-1 text-red-500">
+//         <ArrowDownRight className="h-4 w-4" />₹{row.original.expense.toFixed(2)}
+//       </div>
+//     ),
+//   },
+//   {
+//     accessorKey: "earning",
+//     header: "Earning",
+//     cell: ({ row }) => (
+//       <div className="flex items-center gap-1 text-green-500">
+//         <ArrowUpRight className="h-4 w-4" />₹{row.original.earning.toFixed(2)}
+//       </div>
+//     ),
+//   },
+//   {
+//     id: "actions",
+//     header: "Actions",
+//     cell: ({ row }) => (
+//       <Button variant="ghost" size="icon">
+//         <Eye className="h-4 w-4" />
+//       </Button>
+//     ),
+//   },
+// ];
 
 const AccountingModule = () => {
+  const [accountsListing, setAccountsListing] = React.useState({
+    data: [],
+    count: 0,
+  });
+  const router = useRouter();
+  const [isLoading, setIsLoading] = React.useState(false);
+  const params = useParams();
+  const searchParams = useSearchParams();
+  const getAccountsListing = async () => {
+    try {
+      setIsLoading(true);
+      const urlSearchParams = new URLSearchParams();
+      if (params?.pagination) {
+        const pagination = Number(params?.pagination) - 1;
+        urlSearchParams.append("pagination", pagination.toString());
+      }
+      const searchQuery = searchParams.get("search");
+      if (searchQuery) {
+        urlSearchParams.append("search", searchQuery);
+      }
+      urlSearchParams.append("limit", "10");
+      const apiResponse = await henceforthApi.SuperAdmin.getAccountingData();
+
+      setAccountsListing({
+        data: apiResponse?.data?.data,
+        count: apiResponse?.data?.count,
+      });
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const handlePageChange = (page: number) => {
+    const query = new URLSearchParams(searchParams?.toString());
+
+    router.replace(`/accounting/page/${page}?${query.toString()}`, {
+      scroll: false,
+    });
+  };
+
+  useEffect(() => {
+    getAccountsListing();
+  }, [searchParams]);
+  const [searchTerm, setSearchTerm] = React.useState(
+    () => searchParams?.get("search") || ""
+  );
+  const timerRef = useRef<NodeJS.Timeout>();
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, []);
+
+  const accountingColumns = [
+    {
+      accessorKey: "index",
+      header: "Sr. no",
+      cell: ({ row }) => {
+        let currentPage = Number(params?.pagination) || 1;
+        let itemsPerPage = Number(searchParams.get("limit")) || 10;
+        return (
+          <span className="font-medium">
+            {row.index + 1 + (currentPage - 1) * itemsPerPage}
+          </span>
+        );
+      },
+    },
+    {
+      accessorKey: "subscription_id",
+      header: "Subscription ID",
+      cell: ({ row }) => (
+        <span className="font-medium">{row.original?.subscription_id}</span>
+      ),
+    },
+    {
+      accessorKey: "workspace",
+      header: "Workspace",
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          <Avatar className="h-10 w-10 border-2 border-white shadow-md">
+            <AvatarImage
+              src={henceforthApi?.FILES?.imageOriginal(
+                row.original?.workspace?.image
+              )}
+              alt={row.original?.workspace?.name}
+            />
+            <AvatarFallback>
+              <Building2 className="h-4 w-4" />
+            </AvatarFallback>
+          </Avatar>
+          <span>{row.original?.workspace?.name}</span>
+        </div>
+      ),
+    },
+    {
+      accessorKey: "vendor",
+      header: "Vendor",
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          <Avatar className="h-10 w-10 border-2 border-white shadow-md">
+            <AvatarImage
+              className=" object-cover "
+              src={henceforthApi?.FILES?.imageOriginal(
+                row.original?.vendor?.profile_pic
+              )}
+              alt={row.original?.vendor?.name}
+            />
+            <AvatarFallback>
+              <User className="h-4 w-4" />
+            </AvatarFallback>
+          </Avatar>
+          <span>{row.original?.vendor?.name}</span>
+        </div>
+      ),
+    },
+    {
+      accessorKey: "plan_name",
+      header: "Plan",
+      cell: ({ row }) => (
+        <Badge variant={"secondary"} className="font-medium">
+          {row.original?.plan_name}
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: "amount",
+      header: "Amount",
+      cell: ({ row }) => (
+        <div className="font-medium">₹{row.original?.amount?.toFixed(2)}</div>
+      ),
+    },
+    {
+      accessorKey: "created_at",
+      header: "Date",
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          <Calendar className="h-4 w-4 text-gray-500" />
+          {dayjs(row.original?.created_at).format("DD MMM YYYY")}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => (
+        <Badge
+          className={`px-2 py-1 rounded-lg shadow-md ${
+            row.original?.status === "authenticated"
+              ? "bg-green-100 text-green-800"
+              : "bg-yellow-100 text-yellow-800"
+          }`}
+        >
+          {row.original?.status === "authenticated" ? "Success" : "Pending"}
+        </Badge>
+      ),
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => (
+        <Button variant="ghost" size="icon">
+          <Eye className="h-4 w-4" />
+        </Button>
+      ),
+    },
+  ];
+  const skeletonColumns = accountingColumns.map((column: any) => ({
+    ...column,
+    cell: () => <Skeleton className="h-5 p-3 bg-gray-200 animate-pulse" />,
+  }));
+  const handleSearch = (value: string) => {
+    const query = new URLSearchParams(searchParams?.toString());
+    if (value) {
+      query.set("search", value);
+    } else {
+      query.delete("search");
+    }
+    router.replace(`/accounting/page/1?${query.toString()}`, { scroll: false });
+  };
+
+  const onSearch = (value: string) => {
+    setSearchTerm(value);
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+    timerRef.current = setTimeout(() => {
+      handleSearch(value.trim());
+    }, 500);
+  };
+
   return (
     <PageContainer>
       <div className="grid grid-cols-1 col-span-1 space-y-4">
@@ -162,9 +335,7 @@ const AccountingModule = () => {
                   <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Total Revenue
                   </p>
-                  <h3 className="text-2xl font-bold mt-2">
-                    ₹{summaryMetrics.totalRevenue.toFixed(2)}
-                  </h3>
+                  <h3 className="text-2xl font-bold mt-2">{"N/A"}</h3>
                 </div>
                 <div className="p-2 bg-blue-500 rounded-lg text-white">
                   <FaMoneyBill1Wave className="h-5 w-5" />
@@ -180,9 +351,7 @@ const AccountingModule = () => {
                   <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Total Earnings
                   </p>
-                  <h3 className="text-2xl font-bold mt-2">
-                    ₹{summaryMetrics.totalEarnings.toFixed(2)}
-                  </h3>
+                  <h3 className="text-2xl font-bold mt-2">{"N/A"}</h3>
                 </div>
                 <div className="p-2 bg-green-500 rounded-lg text-white">
                   <TrendingUp className="h-5 w-5" />
@@ -198,9 +367,7 @@ const AccountingModule = () => {
                   <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Total Expenses
                   </p>
-                  <h3 className="text-2xl font-bold mt-2">
-                    ₹{summaryMetrics.totalExpenses.toFixed(2)}
-                  </h3>
+                  <h3 className="text-2xl font-bold mt-2">{"N/A"}</h3>
                 </div>
                 <div className="p-2 bg-red-500 rounded-lg text-white">
                   <TrendingDown className="h-5 w-5" />
@@ -216,9 +383,7 @@ const AccountingModule = () => {
                   <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Growth Rate
                   </p>
-                  <h3 className="text-2xl font-bold mt-2">
-                    {summaryMetrics.growthRate}%
-                  </h3>
+                  <h3 className="text-2xl font-bold mt-2">{"N/A"}</h3>
                 </div>
                 <div className="p-2 bg-purple-500 rounded-lg text-white">
                   <TrendingUp className="h-5 w-5" />
@@ -245,13 +410,15 @@ const AccountingModule = () => {
             {/* Search and Filter Section */}
             <div className="flex flex-col md:flex-row gap-4">
               <div className="relative flex-1">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+                <Search className="absolute left-2 top-3 h-4 w-4  text-gray-500" />
                 <Input
-                  placeholder="Search by order number or workspace..."
-                  className="pl-8"
+                  placeholder="Search by vendor name..."
+                  className="pl-9"
+                  value={searchTerm}
+                  onChange={(e) => onSearch(e.target.value)}
                 />
               </div>
-              <div className="flex gap-2">
+              {/* <div className="flex gap-2">
                 <Select>
                   <SelectTrigger className="w-[150px]">
                     <SelectValue placeholder="Date Range" />
@@ -266,15 +433,35 @@ const AccountingModule = () => {
                 <Button variant="outline" size="icon">
                   <Filter className="h-4 w-4" />
                 </Button>
-              </div>
+              </div> */}
             </div>
 
             {/* Data Table */}
-            <DataTable
-              columns={accountingColumns}
-              data={accountingData}
-              totalItems={10}
-            />
+            {isLoading ? (
+              <DataTable
+                columns={skeletonColumns}
+                data={Array.from({ length: 10 })}
+                totalItems={10}
+              />
+            ) : (
+              <DataTable
+                columns={accountingColumns}
+                data={accountsListing?.data}
+                totalItems={10}
+              />
+            )}
+            {accountsListing?.data?.length ? (
+              <div className="flex justify-center mt-6">
+                <PaginationCompo
+                  currentPage={Number(params?.pagination) || 1}
+                  itemsPerPage={Number(searchParams.get("limit")) || 10}
+                  totalDataCount={accountsListing?.count}
+                  onPageChange={handlePageChange}
+                />
+              </div>
+            ) : (
+              ""
+            )}
           </CardContent>
         </Card>
       </div>

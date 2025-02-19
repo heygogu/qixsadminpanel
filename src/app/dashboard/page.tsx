@@ -48,11 +48,11 @@ const Dashboard = () => {
     total_chat: 0,
     voice_chat: 0,
     total_vendor: 0,
-    total_earning: 0,
+    total_earning: "N/A",
     total_subscription: 0,
     total_payments: 0,
-    gpt_spendings: 0,
-    deepgram_spendings: 0,
+    gpt_spendings: "N/A",
+    deepgram_spendings: "N/A",
   });
 
   const [vendorData, setVendorData] = useState({
@@ -80,11 +80,11 @@ const Dashboard = () => {
         total_chat: Stats?.total_chat,
         voice_chat: Stats?.voice_chat,
         total_vendor: Stats?.total_vendor,
-        total_earning: Stats?.total_earning,
+        total_earning: "N/A",
         total_subscription: Stats?.total_subscription,
         total_payments: Stats?.total_payments,
-        gpt_spendings: Stats?.gpt_spendings,
-        deepgram_spendings: Stats?.deepgram_spendings,
+        gpt_spendings: "N/A",
+        deepgram_spendings: "N/A",
       }));
     } catch (error) {}
   };
@@ -347,7 +347,7 @@ const Dashboard = () => {
               icon={<MessageSquare className="h-4 w-4" />}
               trend={8.2}
               trendUp={true}
-              description="vs. last period"
+              // description="vs. last period"
             />
             <StatsCard
               title="Total Calls"
@@ -355,7 +355,7 @@ const Dashboard = () => {
               icon={<Phone className="h-4 w-4" />}
               trend={5.1}
               trendUp={true}
-              description="vs. last period"
+              // description="vs. last period"
             />
             <StatsCard
               title="Total Vendors"
@@ -363,15 +363,16 @@ const Dashboard = () => {
               icon={<Users className="h-4 w-4" />}
               trend={2.3}
               trendUp={false}
-              description="vs. last period"
+              // description="vs. last period"
             />
             <StatsCard
               title="Total Earnings"
-              value={`₹${stats?.total_earning?.toFixed(2)}`}
+              // value={`₹${stats?.total_earning?.toFixed(2)}`}
+              value="N/A"
               icon={<IndianRupee className="h-4 w-4" />}
               trend={12.5}
               trendUp={true}
-              description="vs. last period"
+              // description="vs. last period"
             />
           </div>
         </div>
@@ -386,9 +387,9 @@ const Dashboard = () => {
               icon={<CreditCard className="h-4 w-4" />}
               trend={4.5}
               trendUp={true}
-              description={`${stats?.total_subscription} last ${
-                period === "TODAY" ? "day" : period?.toLowerCase()
-              }`}
+              // description={`${stats?.total_subscription} last ${
+              //   period === "TODAY" ? "day" : period?.toLowerCase()
+              // }`}
             />
             <StatsCard
               title="Total Payments"
@@ -396,31 +397,33 @@ const Dashboard = () => {
               icon={<Wallet className="h-4 w-4" />}
               trend={6.8}
               trendUp={true}
-              description={`₹${stats?.total_payments?.toFixed(2)} last  last ${
-                period === "TODAY" ? "day" : period?.toLowerCase()
-              }`}
+              // description={`₹${stats?.total_payments?.toFixed(2)} last  last ${
+              //   period === "TODAY" ? "day" : period?.toLowerCase()
+              // }`}
             />
             <StatsCard
               title="GPT Spendings"
-              value={`₹${stats?.gpt_spendings?.toFixed(2)}`}
+              // value={`₹${stats?.gpt_spendings?.toFixed(2)}`}
+              value="N/A"
               icon={<Brain className="h-4 w-4" />}
               trend={2.1}
               trendUp={false}
-              description={`₹${stats?.gpt_spendings?.toFixed(2)} last ${
-                period === "TODAY" ? "day" : period?.toLowerCase()
-              }`}
+              // description={`₹${stats?.gpt_spendings?.toFixed(2)} last ${
+              //   period === "TODAY" ? "day" : period?.toLowerCase()
+              // }`}
             />
             <StatsCard
               title="Deepgram Spendings"
-              value={`₹${stats?.deepgram_spendings?.toFixed(2)}`}
+              // value={`₹${stats?.deepgram_spendings?.toFixed(2)}`}
+              value="N/A"
               icon={<Mic className="h-4 w-4" />}
               trend={3.4}
               trendUp={true}
-              description={`₹${stats?.deepgram_spendings?.toFixed(
-                2
-              )} last  last ${
-                period === "TODAY" ? "day" : period?.toLowerCase()
-              }`}
+              // description={`₹${stats?.deepgram_spendings?.toFixed(
+              //   2
+              // )} last  last ${
+              //   period === "TODAY" ? "day" : period?.toLowerCase()
+              // }`}
             />
           </div>
         </div>
@@ -459,7 +462,7 @@ const Dashboard = () => {
 };
 
 // Stats Card Component
-const StatsCard = ({ title, value, icon, trend, trendUp, description }) => (
+const StatsCard = ({ title, value, icon, trend, trendUp }) => (
   <Card>
     <CardContent className="pt-6">
       <div className="flex items-center justify-between mb-4">

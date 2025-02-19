@@ -9,13 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import {
   Form,
   FormControl,
@@ -29,28 +23,13 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
-import {
-  AlertCircle,
-  Code2,
-  Globe,
-  Headphones,
-  LibraryBig,
-  Loader2,
-  MessageCircle,
-  Phone,
-  Shield,
-  Speaker,
-  Sparkles,
-  ChevronsUpDown,
-  Check,
-  BotIcon,
-} from "lucide-react";
+import { Loader2, Sparkles, ChevronsUpDown, Check, User } from "lucide-react";
 // import { Alert, AlertDescription } from "@/components/ui/alert";
 import countryCode from "@/utils/countryCode.json";
 import DashboardLayout from "@/components/layouts/dashboard-layout";
 import PageContainer from "@/components/layouts/page-container";
 import "flag-icons/css/flag-icons.min.css";
-import { useEffect, useState } from "react";
+
 import henceforthApi from "@/utils/henceforthApis";
 import { cn } from "@/lib/utils";
 import {
@@ -68,7 +47,8 @@ import {
 } from "@/components/ui/command";
 
 import { useGlobalContext } from "@/app/providers/Provider";
-import { MultiSelect } from "@/components/common/MultiSelect";
+import { useEffect, useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 // Zod schema for form validation
 const formSchema = z.object({
@@ -78,16 +58,6 @@ const formSchema = z.object({
     .min(7, "Phone number must be at least 7 digits")
     .max(15, "Phone number must not exceed 15 digits")
     .regex(/^\d+$/, "Phone number must contain only digits"),
-  knowledgeBase: z.array(z.string()),
-  voice: z.string().min(1, "Please select a voice"),
-  systemPrompt: z
-    .string()
-    .min(5, "System prompt must be at least 5 characters"),
-
-  firstMessage: z
-    .string()
-    .min(5, "First message must be at least 5 characters"),
-  ai_model: z.string().min(1, "Please select an AI model"),
 });
 
 const PhoneNumberSubmission = () => {
@@ -96,73 +66,33 @@ const PhoneNumberSubmission = () => {
     defaultValues: {
       countryCode: "+91",
       phoneNumber: "",
-      knowledgeBase: [],
     },
   });
-  const [knowledgeBaseOptions, setKnowledgeBaseOptions] = useState<any>([]);
+
   const { userInfo, Toast } = useGlobalContext();
-  const knowledgeBasesforSelection = knowledgeBaseOptions?.map(
-    (option: any) => ({
-      value: option?._id,
-      label: option?.name,
-      icon: LibraryBig,
-    })
-  );
-  const [defaultKnowledgeBase, setDefaultKnowledgeBase] = useState<any>([]);
+  const [callAgent, setCallAgent] = useState<any>();
 
   useEffect(() => {
-    const getKnowledgeBaseOptions = async () => {
+    async function getCallAgent() {
       try {
-        const apiRes = await henceforthApi.SuperAdmin.getKnowledgeBases();
-        console.log(apiRes?.data, "apiRes?.data");
-        setKnowledgeBaseOptions(apiRes?.data);
+        const res = await henceforthApi.SuperAdmin.getCallAgentData();
+        console.log(res);
+        setCallAgent(res?.data);
       } catch (error) {}
-    };
+    }
 
-    getKnowledgeBaseOptions();
+    getCallAgent();
   }, []);
+  // const [kbLoading, setKbLoading] = useState(true);
 
-  const [kbLoading, setKbLoading] = useState(true);
-
-  useEffect(() => {
-    const getFormData = async () => {
-      try {
-        const apiRes = await henceforthApi.SuperAdmin.defaultCallData();
-        console.log(apiRes, "apiRes?.data");
-
-        await setDefaultKnowledgeBase(
-          apiRes?.knowledge_base_id?.map((option: any) => option)
-        );
-        form.reset({
-          ...form.getValues(),
-          voice: apiRes?.voice,
-          systemPrompt: apiRes?.call_prompt || "",
-          firstMessage: apiRes?.call_first_message || "",
-          ai_model: apiRes?.ai_model || "gemini",
-        });
-        setKbLoading(false);
-      } catch (error) {}
-    };
-    getFormData();
-  }, []);
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       // Your API submission logic here
 
-      if (defaultKnowledgeBase?.length === 0) {
-        return Toast.error("Please select a knowledge base");
-      }
       console.log(values);
       const payload = {
         phone_no: `${values.countryCode + values.phoneNumber}`,
-        knowledge_base_id: defaultKnowledgeBase,
         secret_key: userInfo?.workspace?.key,
-        voice: values.voice,
-        prompt: values.systemPrompt,
-        call_first_message: values.firstMessage,
-        call_prompt: values.systemPrompt,
-        ai_model: values.ai_model,
-        first_message: values.firstMessage,
       };
 
       const apiRes = await henceforthApi.SuperAdmin.callTesting(payload);
@@ -184,7 +114,7 @@ const PhoneNumberSubmission = () => {
         )}
       >
         <div className="">
-          <div className="grid ">
+          <div className="grid md:grid-cols-2 grid-cols-1 gap-6">
             {/* Main Form */}
             <div className="">
               <Card className="">
@@ -194,18 +124,41 @@ const PhoneNumberSubmission = () => {
                       <Sparkles className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                      <CardTitle>Call Configuration</CardTitle>
+                      <CardTitle>Call Testing</CardTitle>
                       <CardDescription>Set up your phone call</CardDescription>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent>
                   <Form {...form}>
+                    <div className="space-y-4 mb-16">
+                      {/* show agent photo and agent name using sahdcn avatar and cenetered */}
+                      <div className="flex flex-col items-center space-y-2">
+                        <Avatar className="w-32 h-32">
+                          {callAgent?.image ? (
+                            <AvatarImage
+                              className="object-cover w-full h-full rounded-full"
+                              src={henceforthApi?.FILES?.imageOriginal(
+                                callAgent?.image
+                              )}
+                              alt={callAgent?.name}
+                            />
+                          ) : (
+                            <AvatarFallback className="text-2xl">
+                              <User size={50} />
+                            </AvatarFallback>
+                          )}
+                        </Avatar>
+                        <div className="text-lg font-bold">
+                          {callAgent?.name}
+                        </div>
+                      </div>
+                    </div>
                     <form
                       onSubmit={form.handleSubmit(onSubmit)}
                       className="space-y-6"
                     >
-                      <div className="grid grid-cols-1 md:grid-cols-[150px_1fr] ">
+                      <div className="grid grid-cols-1 md:grid-cols-[150px_1fr] sm:grid-cols-1 ">
                         {/* Country Code */}
                         <FormField
                           control={form.control}
@@ -327,181 +280,6 @@ const PhoneNumberSubmission = () => {
                           )}
                         />
                       </div>
-
-                      {/* Knowledge Base */}
-                      {!kbLoading ? (
-                        <FormField
-                          name="knowledgeBase"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="flex items-center gap-2">
-                                <LibraryBig className="h-4 w-4" />
-                                Knowledge Base
-                              </FormLabel>
-
-                              <MultiSelect
-                                options={knowledgeBasesforSelection}
-                                onValueChange={setDefaultKnowledgeBase}
-                                defaultValue={defaultKnowledgeBase}
-                                placeholder="Select Knowledge Bases"
-                                variant="inverted"
-                                animation={2}
-                                maxCount={8}
-                              />
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      ) : (
-                        <span className="text-sm font-semibold">
-                          Loading Knowledge Bases...
-                        </span>
-                      )}
-                      {/*AI Model*/}
-                      <FormField
-                        control={form.control}
-                        name="ai_model"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="flex items-center gap-2">
-                              <BotIcon className="h-4 w-4" />
-                              AI Model
-                            </FormLabel>
-                            <Select
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                              value={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger
-                                  className={
-                                    !field.value ? "text-muted-foreground" : ""
-                                  }
-                                >
-                                  <SelectValue placeholder="Select AI Model" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="gemini">Gemini</SelectItem>
-                                <SelectItem value="chatgpt">ChatGPT</SelectItem>
-                                <SelectItem value="deepseek">
-                                  DeepSeek
-                                </SelectItem>
-                                <SelectItem value="claude">Claude</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      {/* Voice Selection */}
-                      <FormField
-                        control={form.control}
-                        name="voice"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="flex items-center gap-2">
-                              <Speaker className="h-4 w-4" />
-                              Voice Selection
-                            </FormLabel>
-                            <Select
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                              value={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select voice" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="aura-asteria-en">
-                                  Asteria (English - US, Female)
-                                </SelectItem>
-                                <SelectItem value="aura-luna-en">
-                                  Luna (English - US, Female)
-                                </SelectItem>
-                                <SelectItem value="aura-stella-en">
-                                  Stella (English - US, Female)
-                                </SelectItem>
-                                <SelectItem value="aura-athena-en">
-                                  Athena (English - UK, Female)
-                                </SelectItem>
-                                <SelectItem value="aura-hera-en">
-                                  Hera (English - US, Female)
-                                </SelectItem>
-                                <SelectItem value="aura-orion-en">
-                                  Orion (English - US, Male)
-                                </SelectItem>
-                                <SelectItem value="aura-arcas-en">
-                                  Arcas (English - US, Male)
-                                </SelectItem>
-                                <SelectItem value="aura-perseus-en">
-                                  Perseus (English - US, Male)
-                                </SelectItem>
-                                <SelectItem value="aura-angus-en">
-                                  Angus (English - Ireland, Male)
-                                </SelectItem>
-                                <SelectItem value="aura-orpheus-en">
-                                  Orpheus (English - US, Male)
-                                </SelectItem>
-                                <SelectItem value="aura-helios-en">
-                                  Helios (English - UK, Male)
-                                </SelectItem>
-                                <SelectItem value="aura-zeus-en">
-                                  Zeus (English - US, Male)
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      {/* System Prompt */}
-                      <FormField
-                        control={form.control}
-                        name="systemPrompt"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="flex items-center gap-2">
-                              <Code2 className="h-4 w-4" />
-                              System Prompt
-                            </FormLabel>
-                            <FormControl>
-                              <Textarea
-                                placeholder="Enter system prompt..."
-                                className="min-h-[200px] p-5"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      {/* First Message */}
-                      <FormField
-                        control={form.control}
-                        name="firstMessage"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="flex items-center gap-2">
-                              <MessageCircle className="h-4 w-4" />
-                              First Message
-                            </FormLabel>
-                            <FormControl>
-                              <Textarea
-                                placeholder="Enter first message..."
-                                className="min-h-[200px] p-5"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
 
                       <Button
                         type="submit"
